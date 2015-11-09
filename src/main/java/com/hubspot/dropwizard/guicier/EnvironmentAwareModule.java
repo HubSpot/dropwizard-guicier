@@ -12,7 +12,7 @@ public abstract class EnvironmentAwareModule implements Module {
   private volatile Environment environment = null;
 
   @Override
-  public void configure(Binder binder) {
+  public final void configure(Binder binder) {
     configure(decorate(binder), getEnvironment());
   }
 

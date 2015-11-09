@@ -12,7 +12,7 @@ public abstract class BootstrapAwareModule implements Module {
   private volatile Bootstrap<?> bootstrap = null;
 
   @Override
-  public void configure(Binder binder) {
+  public final void configure(Binder binder) {
     configure(decorate(binder), getBootstrap());
   }
 
