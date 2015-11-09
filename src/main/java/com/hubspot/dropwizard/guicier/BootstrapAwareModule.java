@@ -13,7 +13,7 @@ public abstract class BootstrapAwareModule implements Module {
 
   @Override
   public void configure(Binder binder) {
-    configure(binder, getBootstrap());
+    configure(decorate(binder), getBootstrap());
   }
 
   protected Bootstrap<?> getBootstrap() {
@@ -26,4 +26,14 @@ public abstract class BootstrapAwareModule implements Module {
   }
 
   protected abstract void configure(Binder binder, Bootstrap<?> bootstrap);
+
+  private Binder decorate(final Binder binder) {
+    return new DecoratingBinder(binder) {
+      @Override public void beforeInstall(Module module) {
+        if (module instanceof BootstrapAwareModule) {
+          ((BootstrapAwareModule)module).setBootstrap(getBootstrap());
+        }
+      }
+    };
+  }
 }
