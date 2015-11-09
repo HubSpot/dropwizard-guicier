@@ -75,7 +75,11 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
   @Named(GUICE_BUNDLE_NAME)
   private volatile Function<ResourceConfig, ServletContainer> replacer = null;
 
-  private GuiceBundle(final Class<T> configClass, final ImmutableSet<Module> guiceModules, final ImmutableSet<ConfigurationAwareModule<T>> configurationAwareModules, final ImmutableSet<BootstrapAwareModule> bootstrapAwareModules, final Stage guiceStage) {
+  private GuiceBundle(final Class<T> configClass,
+                      final ImmutableSet<Module> guiceModules,
+                      final ImmutableSet<ConfigurationAwareModule<T>> configurationAwareModules,
+                      final ImmutableSet<BootstrapAwareModule> bootstrapAwareModules,
+                      final Stage guiceStage) {
     this.configClass = configClass;
 
     this.guiceModules = guiceModules;

@@ -28,11 +28,20 @@ public abstract class BootstrapAwareModule implements Module {
   protected abstract void configure(Binder binder, Bootstrap<?> bootstrap);
 
   private Binder decorate(final Binder binder) {
-    return new DecoratingBinder(binder) {
-      @Override public void beforeInstall(Module module) {
+    return new ForwardingBinder() {
+
+      @Override
+      protected Binder getDelegate() {
+        return binder;
+      }
+
+      @Override
+      public void install(Module module) {
         if (module instanceof BootstrapAwareModule) {
-          ((BootstrapAwareModule)module).setBootstrap(getBootstrap());
+          ((BootstrapAwareModule) module).setBootstrap(getBootstrap());
         }
+
+        super.install(module);
       }
     };
   }

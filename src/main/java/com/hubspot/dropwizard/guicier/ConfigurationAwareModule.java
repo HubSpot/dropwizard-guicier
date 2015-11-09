@@ -29,11 +29,21 @@ public abstract class ConfigurationAwareModule<Configuration> implements Module 
   protected abstract void configure(final Binder binder, final Configuration configuration);
 
   private Binder decorate(final Binder binder) {
-    return new DecoratingBinder(binder) {
-      @Override public void beforeInstall(Module module) {
+    return new ForwardingBinder() {
+
+      @Override
+      protected Binder getDelegate() {
+        return binder;
+      }
+
+      @Override
+      @SuppressWarnings("unchecked")
+      public void install(Module module) {
         if (module instanceof ConfigurationAwareModule<?>) {
-          ((ConfigurationAwareModule<Configuration>)module).setConfiguration(getConfiguration());
+          ((ConfigurationAwareModule<Configuration>) module).setConfiguration(getConfiguration());
         }
+
+        super.install(module);
       }
     };
   }

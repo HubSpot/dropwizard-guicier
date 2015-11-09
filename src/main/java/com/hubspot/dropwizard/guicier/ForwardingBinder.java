@@ -26,164 +26,159 @@ import com.google.inject.spi.ProvisionListener;
 import com.google.inject.spi.TypeConverter;
 import com.google.inject.spi.TypeListener;
 
-public abstract class DecoratingBinder implements Binder {
-  private final Binder binder;
+public abstract class ForwardingBinder implements Binder {
 
-  public DecoratingBinder(Binder binder) {
-    this.binder = binder;
-  }
-
-  public abstract void beforeInstall(Module module);
+  protected abstract Binder getDelegate();
 
   @Override
   public void install(Module module) {
-    binder.install(module);
+    getDelegate().install(module);
   }
 
   @Override
   public void bindInterceptor(Matcher<? super Class<?>> classMatcher,
-      Matcher<? super Method> methodMatcher,
-      MethodInterceptor... interceptors) {
-    binder.bindInterceptor(classMatcher, methodMatcher, interceptors);
+                              Matcher<? super Method> methodMatcher,
+                              MethodInterceptor... interceptors) {
+    getDelegate().bindInterceptor(classMatcher, methodMatcher, interceptors);
   }
 
   @Override
   public void bindScope(Class<? extends Annotation> annotationType, Scope scope) {
-    binder.bindScope(annotationType, scope);
+    getDelegate().bindScope(annotationType, scope);
   }
 
   @Override
   public <T> LinkedBindingBuilder<T> bind(Key<T> key) {
-    return binder.bind(key);
+    return getDelegate().bind(key);
   }
 
   @Override
   public <T> AnnotatedBindingBuilder<T> bind(TypeLiteral<T> typeLiteral) {
-    return binder.bind(typeLiteral);
+    return getDelegate().bind(typeLiteral);
   }
 
   @Override
   public <T> AnnotatedBindingBuilder<T> bind(Class<T> type) {
-    return binder.bind(type);
+    return getDelegate().bind(type);
   }
 
   @Override
   public AnnotatedConstantBindingBuilder bindConstant() {
-    return binder.bindConstant();
+    return getDelegate().bindConstant();
   }
 
   @Override
   public <T> void requestInjection(TypeLiteral<T> type, T instance) {
-    binder.requestInjection(type, instance);
+    getDelegate().requestInjection(type, instance);
   }
 
   @Override
   public void requestInjection(Object instance) {
-    binder.requestInjection(instance);
+    getDelegate().requestInjection(instance);
   }
 
   @Override
   public void requestStaticInjection(Class<?>... types) {
-    binder.requestStaticInjection(types);
+    getDelegate().requestStaticInjection(types);
   }
 
   @Override
   public Stage currentStage() {
-    return binder.currentStage();
+    return getDelegate().currentStage();
   }
 
   @Override
   public void addError(String message, Object... arguments) {
-    binder.addError(message, arguments);
+    getDelegate().addError(message, arguments);
   }
 
   @Override
   public void addError(Throwable t) {
-    binder.addError(t);
+    getDelegate().addError(t);
   }
 
   @Override
   public void addError(Message message) {
-    binder.addError(message);
+    getDelegate().addError(message);
   }
 
   @Override
   public <T> Provider<T> getProvider(Key<T> key) {
-    return binder.getProvider(key);
+    return getDelegate().getProvider(key);
   }
 
   @Override
   public <T> Provider<T> getProvider(Dependency<T> dependency) {
-    return binder.getProvider(dependency);
+    return getDelegate().getProvider(dependency);
   }
 
   @Override
   public <T> Provider<T> getProvider(Class<T> type) {
-    return binder.getProvider(type);
+    return getDelegate().getProvider(type);
   }
 
   @Override
   public <T> MembersInjector<T> getMembersInjector(TypeLiteral<T> typeLiteral) {
-    return binder.getMembersInjector(typeLiteral);
+    return getDelegate().getMembersInjector(typeLiteral);
   }
 
   @Override
   public <T> MembersInjector<T> getMembersInjector(Class<T> type) {
-    return binder.getMembersInjector(type);
+    return getDelegate().getMembersInjector(type);
   }
 
   @Override
   public void convertToTypes(Matcher<? super TypeLiteral<?>> typeMatcher, TypeConverter converter) {
-    binder.convertToTypes(typeMatcher, converter);
+    getDelegate().convertToTypes(typeMatcher, converter);
   }
 
   @Override
   public void bindListener(Matcher<? super TypeLiteral<?>> typeMatcher, TypeListener listener) {
-    binder.bindListener(typeMatcher, listener);
+    getDelegate().bindListener(typeMatcher, listener);
   }
 
   @Override
   public void bindListener(Matcher<? super Binding<?>> bindingMatcher, ProvisionListener... listeners) {
-    binder.bindListener(bindingMatcher, listeners);
+    getDelegate().bindListener(bindingMatcher, listeners);
   }
 
   @Override
   public Binder withSource(Object source) {
-    return binder.withSource(source);
+    return getDelegate().withSource(source);
   }
 
   @Override
   public Binder skipSources(Class... classesToSkip) {
-    return binder.skipSources(classesToSkip);
+    return getDelegate().skipSources(classesToSkip);
   }
 
   @Override
   public PrivateBinder newPrivateBinder() {
-    return binder.newPrivateBinder();
+    return getDelegate().newPrivateBinder();
   }
 
   @Override
   public void requireExplicitBindings() {
-    binder.requireExplicitBindings();
+    getDelegate().requireExplicitBindings();
   }
 
   @Override
   public void disableCircularProxies() {
-    binder.disableCircularProxies();
+    getDelegate().disableCircularProxies();
   }
 
   @Override
   public void requireAtInjectOnConstructors() {
-    binder.requireAtInjectOnConstructors();
+    getDelegate().requireAtInjectOnConstructors();
   }
 
   @Override
   public void requireExactBindingAnnotations() {
-    binder.requireExactBindingAnnotations();
+    getDelegate().requireExactBindingAnnotations();
   }
 
   @Override
   public void scanModulesForAnnotatedMethods(ModuleAnnotatedMethodScanner scanner) {
-    binder.scanModulesForAnnotatedMethods(scanner);
+    getDelegate().scanModulesForAnnotatedMethods(scanner);
   }
 }
