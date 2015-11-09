@@ -64,9 +64,7 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
   }
 
   private final Class<T> configClass;
-  private final ImmutableSet<ConfigurationAwareModule<T>> configurationAwareModules;
-  private final ImmutableSet<EnvironmentAwareModule> environmentAwareModules;
-  private final ImmutableSet<BootstrapAwareModule> bootstrapAwareModules;
+  private final ImmutableSet<DropwizardAwareModule<T>> dropwizardAwareModules;
   private final ImmutableSet<Module> guiceModules;
   private final Stage guiceStage;
 
@@ -78,16 +76,12 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
 
   private GuiceBundle(final Class<T> configClass,
                       final ImmutableSet<Module> guiceModules,
-                      final ImmutableSet<ConfigurationAwareModule<T>> configurationAwareModules,
-                      final ImmutableSet<EnvironmentAwareModule> environmentAwareModules,
-                      final ImmutableSet<BootstrapAwareModule> bootstrapAwareModules,
+                      final ImmutableSet<DropwizardAwareModule<T>> dropwizardAwareModules,
                       final Stage guiceStage) {
     this.configClass = configClass;
 
     this.guiceModules = guiceModules;
-    this.configurationAwareModules = configurationAwareModules;
-    this.environmentAwareModules = environmentAwareModules;
-    this.bootstrapAwareModules = bootstrapAwareModules;
+    this.dropwizardAwareModules = dropwizardAwareModules;
     this.guiceStage = guiceStage;
   }
 
@@ -98,16 +92,10 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
 
   @Override
   public void run(final T configuration, final Environment environment) throws Exception {
-    for (ConfigurationAwareModule<T> configurationAwareModule : configurationAwareModules) {
-      configurationAwareModule.setConfiguration(configuration);
-    }
-
-    for (EnvironmentAwareModule environmentAwareModule : environmentAwareModules) {
-      environmentAwareModule.setEnvironment(environment);
-    }
-
-    for (BootstrapAwareModule bootstrapAwareModule : bootstrapAwareModules) {
-      bootstrapAwareModule.setBootstrap(bootstrap);
+    for (DropwizardAwareModule<T> dropwizardAwareModule : dropwizardAwareModules) {
+      dropwizardAwareModule.setBootstrap(bootstrap);
+      dropwizardAwareModule.setConfiguration(configuration);
+      dropwizardAwareModule.setEnvironment(environment);
     }
 
     final DropwizardModule dropwizardModule = new DropwizardModule();
@@ -116,8 +104,7 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
         Guice.createInjector(guiceStage,
                 ImmutableSet.<Module>builder()
                         .addAll(guiceModules)
-                        .addAll(configurationAwareModules)
-                        .addAll(bootstrapAwareModules)
+                        .addAll(dropwizardAwareModules)
                         .add(new GuiceEnforcerModule())
                         .add(new JerseyServletModule())
                         .add(dropwizardModule)
@@ -261,9 +248,7 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
   public static class Builder<U extends Configuration> {
     private final Class<U> configClass;
     private final ImmutableSet.Builder<Module> guiceModules = ImmutableSet.builder();
-    private final ImmutableSet.Builder<ConfigurationAwareModule<U>> configurationAwareModules = ImmutableSet.builder();
-    private final ImmutableSet.Builder<EnvironmentAwareModule> environmentAwareModules = ImmutableSet.builder();
-    private final ImmutableSet.Builder<BootstrapAwareModule> bootstrapAwareModules = ImmutableSet.builder();
+    private final ImmutableSet.Builder<DropwizardAwareModule<U>> dropwizardAwareModules = ImmutableSet.builder();
     private Stage guiceStage = Stage.PRODUCTION;
 
     private Builder(final Class<U> configClass) {
@@ -286,12 +271,8 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
     @SuppressWarnings("unchecked")
     public final Builder<U> modules(final Iterable<? extends Module> modules) {
       for (Module module : modules) {
-        if (module instanceof ConfigurationAwareModule<?>) {
-          configurationAwareModules.add((ConfigurationAwareModule<U>) module);
-        } else if (module instanceof BootstrapAwareModule) {
-          bootstrapAwareModules.add((BootstrapAwareModule) module);
-        } else if (module instanceof EnvironmentAwareModule) {
-          environmentAwareModules.add((EnvironmentAwareModule) module);
+        if (module instanceof DropwizardAwareModule<?>) {
+          dropwizardAwareModules.add((DropwizardAwareModule<U>) module);
         } else {
           guiceModules.add(module);
         }
@@ -300,8 +281,7 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
     }
 
     public final GuiceBundle<U> build() {
-      return new GuiceBundle<U>(configClass, guiceModules.build(), configurationAwareModules.build(),environmentAwareModules.build(), bootstrapAwareModules.build(), guiceStage);
+      return new GuiceBundle<U>(configClass, guiceModules.build(), dropwizardAwareModules.build(), guiceStage);
     }
   }
 }
-
