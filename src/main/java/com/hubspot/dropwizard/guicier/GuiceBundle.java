@@ -65,6 +65,7 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
 
   private final Class<T> configClass;
   private final ImmutableSet<ConfigurationAwareModule<T>> configurationAwareModules;
+  private final ImmutableSet<EnvironmentAwareModule> environmentAwareModules;
   private final ImmutableSet<BootstrapAwareModule> bootstrapAwareModules;
   private final ImmutableSet<Module> guiceModules;
   private final Stage guiceStage;
@@ -78,12 +79,14 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
   private GuiceBundle(final Class<T> configClass,
                       final ImmutableSet<Module> guiceModules,
                       final ImmutableSet<ConfigurationAwareModule<T>> configurationAwareModules,
+                      final ImmutableSet<EnvironmentAwareModule> environmentAwareModules,
                       final ImmutableSet<BootstrapAwareModule> bootstrapAwareModules,
                       final Stage guiceStage) {
     this.configClass = configClass;
 
     this.guiceModules = guiceModules;
     this.configurationAwareModules = configurationAwareModules;
+    this.environmentAwareModules = environmentAwareModules;
     this.bootstrapAwareModules = bootstrapAwareModules;
     this.guiceStage = guiceStage;
   }
@@ -97,6 +100,10 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
   public void run(final T configuration, final Environment environment) throws Exception {
     for (ConfigurationAwareModule<T> configurationAwareModule : configurationAwareModules) {
       configurationAwareModule.setConfiguration(configuration);
+    }
+
+    for (EnvironmentAwareModule environmentAwareModule : environmentAwareModules) {
+      environmentAwareModule.setEnvironment(environment);
     }
 
     for (BootstrapAwareModule bootstrapAwareModule : bootstrapAwareModules) {
@@ -255,6 +262,7 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
     private final Class<U> configClass;
     private final ImmutableSet.Builder<Module> guiceModules = ImmutableSet.builder();
     private final ImmutableSet.Builder<ConfigurationAwareModule<U>> configurationAwareModules = ImmutableSet.builder();
+    private final ImmutableSet.Builder<EnvironmentAwareModule> environmentAwareModules = ImmutableSet.builder();
     private final ImmutableSet.Builder<BootstrapAwareModule> bootstrapAwareModules = ImmutableSet.builder();
     private Stage guiceStage = Stage.PRODUCTION;
 
@@ -282,6 +290,8 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
           configurationAwareModules.add((ConfigurationAwareModule<U>) module);
         } else if (module instanceof BootstrapAwareModule) {
           bootstrapAwareModules.add((BootstrapAwareModule) module);
+        } else if (module instanceof EnvironmentAwareModule) {
+          environmentAwareModules.add((EnvironmentAwareModule) module);
         } else {
           guiceModules.add(module);
         }
@@ -290,7 +300,7 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
     }
 
     public final GuiceBundle<U> build() {
-      return new GuiceBundle<U>(configClass, guiceModules.build(), configurationAwareModules.build(), bootstrapAwareModules.build(), guiceStage);
+      return new GuiceBundle<U>(configClass, guiceModules.build(), configurationAwareModules.build(),environmentAwareModules.build(), bootstrapAwareModules.build(), guiceStage);
     }
   }
 }
