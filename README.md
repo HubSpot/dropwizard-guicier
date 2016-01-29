@@ -8,7 +8,7 @@ A Dropwizard bundle to handle Guice integration.
         <dependency>
             <groupId>com.hubspot.dropwizard</groupId>
             <artifactId>dropwizard-guicier</artifactId>
-            <version>0.7.1.2</version>
+            <version>0.9.1.0</version>
         </dependency>
     </dependencies>
 ```
@@ -42,7 +42,6 @@ created with `Stage.PRODUCTION` by default)
 access to the `Bootstrap`, `Configuration`, and `Environment` inside of the `configure` method. This can be used to do conditional
 binding, [for example](https://github.com/jhaber/dropwizard-guicier-example/blob/b050d7487b6ab34d351b57a0dde4f0267f0c745e/src/main/java/com/hubspot/dropwizard/example/ExampleModule.java#L21-L24)
 - Any `Managed`, `Task`, `HealthCheck`, or `ServerLifecycleListener` bound in Guice will be added to Dropwizard for you, [for example](https://github.com/jhaber/dropwizard-guicier-example/blob/b050d7487b6ab34d351b57a0dde4f0267f0c745e/src/main/java/com/hubspot/dropwizard/example/ExampleModule.java#L32-L38) (must be eager singletons for this to work)
-- There is a multibinder for `ContainerRequestFilter`, `ContainerResponseFilter`, and `ResourceFilterFactory` which can be used to add filters via Guice, [for example](https://github.com/jhaber/dropwizard-guicier-example/blob/b050d7487b6ab34d351b57a0dde4f0267f0c745e/src/main/java/com/hubspot/dropwizard/example/ExampleModule.java#L26-L30)
 
 ## Examples
 There is an [example project](https://github.com/jhaber/dropwizard-guicier-example) you can clone and play with if you'd like to get
