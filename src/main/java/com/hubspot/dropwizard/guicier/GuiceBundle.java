@@ -108,7 +108,7 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
     injector.injectMembers(this);
     checkState(replacer != null, "No guice container replacer was injected!");
 
-    dropwizardModule.register(environment);
+    dropwizardModule.register(environment, injector);
 
     environment.jersey().replace(replacer);
     environment.servlets().addFilter("Guice Filter", GuiceFilter.class).addMappingForUrlPatterns(null, false, environment.getApplicationContext().getContextPath() + "*");
