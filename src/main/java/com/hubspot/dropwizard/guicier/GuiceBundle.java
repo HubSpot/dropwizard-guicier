@@ -115,10 +115,10 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
   }
 
   private static class GuiceContainerReplacer implements Function<ResourceConfig, Servlet> {
-    private final DropwizardGuiceContainer container;
+    private final ServletContainer container;
 
     @Inject
-    GuiceContainerReplacer(final DropwizardGuiceContainer container) {
+    GuiceContainerReplacer(final ServletContainer container) {
       this.container = checkNotNull(container, "container is null");
     }
 
