@@ -3,6 +3,7 @@ package com.hubspot.dropwizard.guicier;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
+import com.google.inject.Binder;
 import com.google.inject.Module;
 
 import io.dropwizard.setup.Bootstrap;
@@ -38,5 +39,12 @@ public abstract class DropwizardAwareModule<Configuration> implements Module {
   public void setEnvironment(Environment environment) {
     checkState(this.environment == null, "environment was already set!");
     this.environment = checkNotNull(environment, "environment is null");
+  }
+
+  public void install(Binder binder, DropwizardAwareModule<Configuration> module) {
+    module.setBootstrap(getBootstrap());
+    module.setConfiguration(getConfiguration());
+    module.setEnvironment(getEnvironment());
+    binder.install(module);
   }
 }
