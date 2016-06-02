@@ -4,6 +4,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Arrays;
 
+import org.glassfish.hk2.api.ServiceLocator;
+import org.glassfish.hk2.extension.ServiceLocatorGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,7 +75,6 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
                         .addAll(dropwizardAwareModules)
                         .add(new GuiceEnforcerModule())
                         .add(new ServletModule())
-                        .add(new JerseyGuiceModule("__HK2_Generated_0"))
                         .add(dropwizardModule)
                         .add(new Module() {
                           @Override
@@ -82,7 +83,18 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
                             binder.bind(configClass).toInstance(configuration);
                           }
                         }).build());
-    JerseyGuiceUtils.install(injector);
+
+    JerseyGuiceUtils.install(new ServiceLocatorGenerator() {
+
+      @Override
+      public ServiceLocator create(String name, ServiceLocator parent) {
+        if (!name.startsWith("__HK2_Generated_")) {
+          return null;
+        }
+
+        return injector.createChildInjector(new JerseyGuiceModule(name)).getInstance(ServiceLocator.class);
+      }
+    });
 
     dropwizardModule.register(environment, injector);
 

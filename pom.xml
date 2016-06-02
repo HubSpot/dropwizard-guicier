@@ -10,7 +10,7 @@
 
   <groupId>com.hubspot.dropwizard</groupId>
   <artifactId>dropwizard-guicier</artifactId>
-  <version>1.0.0-rc4-SNAPSHOT</version>
+  <version>1.0.0.1-SNAPSHOT</version>
 
   <scm>
     <connection>scm:git:git@github.com:HubSpot/dropwizard-guicier.git</connection>
@@ -177,6 +177,10 @@
     <dependency>
       <groupId>org.glassfish.jersey.core</groupId>
       <artifactId>jersey-server</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.hk2</groupId>
+      <artifactId>hk2-api</artifactId>
     </dependency>
     <dependency>
       <groupId>com.squarespace.jersey2-guice</groupId>
