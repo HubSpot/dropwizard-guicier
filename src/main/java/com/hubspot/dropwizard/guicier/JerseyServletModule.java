@@ -2,8 +2,9 @@ package com.hubspot.dropwizard.guicier;
 
 import com.google.inject.Injector;
 import com.google.inject.servlet.ServletModule;
-import com.squarespace.jersey2.guice.BootstrapModule;
-import com.squarespace.jersey2.guice.BootstrapUtils;
+import com.squarespace.jersey2.guice.JerseyGuiceModule;
+import com.squarespace.jersey2.guice.JerseyGuiceUtils;
+
 import org.glassfish.hk2.api.ServiceLocator;
 
 import javax.inject.Inject;
@@ -13,26 +14,23 @@ public class JerseyServletModule extends ServletModule {
 
   @Override
   protected void configureServlets() {
-    ServiceLocator locator = new ServiceLocatorDecorator(BootstrapUtils.newServiceLocator()) {
+    install(new JerseyGuiceModule(JerseyGuiceUtils.newServiceLocator()));
 
-      @Override
-      public void shutdown() {
-        // don't shutdown, remove once jersey2-guice supports Jersey 2.21
-      }
-    };
-
-    install(new BootstrapModule(locator));
-
-    bind(HK2Linker.class);
+    bind(HK2Installer.class);
   }
 
   @Singleton
-  public static class HK2Linker {
+  public static class HK2Installer {
 
+    /**
+     * Keep the unused ServiceLocator param, this ensures that the
+     * {@link com.squarespace.jersey2.guice.JerseyGuiceModule.ServiceLocatorProvider} has been invoked
+     * before we call{@link JerseyGuiceUtils#install(Injector)} (the provider calls
+     * {@link JerseyGuiceUtils#link(ServiceLocator, Injector)})
+     */
     @Inject
-    public HK2Linker(Injector injector, ServiceLocator locator) {
-      BootstrapUtils.link(locator, injector);
-      BootstrapUtils.install(locator);
+    public HK2Installer(Injector injector, ServiceLocator locator) {
+      JerseyGuiceUtils.install(injector);
     }
   }
 }

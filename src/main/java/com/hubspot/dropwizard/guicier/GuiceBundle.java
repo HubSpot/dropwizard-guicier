@@ -95,7 +95,7 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
                             binder.bind(Environment.class).toInstance(environment);
                             binder.bind(configClass).toInstance(configuration);
 
-                            binder.bind(ServletContainer.class).to(DropwizardGuiceContainer.class);
+                            binder.bind(ServletContainer.class).toInstance(new DropwizardGuiceContainer(environment));
 
                             binder.bind(new TypeLiteral<Function<ResourceConfig, Servlet>>() {
                             })
