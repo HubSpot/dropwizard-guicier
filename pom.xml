@@ -5,7 +5,7 @@
   <parent>
     <groupId>com.hubspot</groupId>
     <artifactId>basepom</artifactId>
-    <version>15.1</version>
+    <version>15.4</version>
   </parent>
 
   <groupId>com.hubspot.dropwizard</groupId>
@@ -27,98 +27,6 @@
       <timezone>-8</timezone>
     </developer>
   </developers>
-
-  <properties>
-    <dropwizard.version>1.0.0-rc3</dropwizard.version>
-    <hibernate.version>5.2.4.Final</hibernate.version>
-
-    <dep.guava.version>19.0</dep.guava.version>
-    <dep.hk2.version>2.4.0-b34</dep.hk2.version>
-    <dep.jackson.version>2.7.4</dep.jackson.version>
-    <dep.jersey.version>2.23</dep.jersey.version>
-    <dep.jetty.version>9.3.9.v20160517</dep.jetty.version>
-    <dep.logback.version>1.1.7</dep.logback.version>
-    <dep.slf4j.version>1.7.21</dep.slf4j.version>
-  </properties>
-
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.glassfish.jersey.core</groupId>
-        <artifactId>jersey-server</artifactId>
-        <version>${dep.jersey.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.glassfish.hk2.external</groupId>
-            <artifactId>javax.inject</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.glassfish.jersey.containers</groupId>
-        <artifactId>jersey-container-servlet-core</artifactId>
-        <version>${dep.jersey.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.glassfish.hk2.external</groupId>
-            <artifactId>javax.inject</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.glassfish.hk2</groupId>
-        <artifactId>hk2-api</artifactId>
-        <version>${dep.hk2.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.glassfish.hk2.external</groupId>
-            <artifactId>aopalliance-repackaged</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.glassfish.hk2</groupId>
-        <artifactId>hk2-locator</artifactId>
-        <version>${dep.hk2.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.glassfish.hk2.external</groupId>
-            <artifactId>aopalliance-repackaged</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.glassfish.hk2</groupId>
-        <artifactId>hk2-utils</artifactId>
-        <version>${dep.hk2.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>javax.ws.rs</groupId>
-        <artifactId>javax.ws.rs-api</artifactId>
-        <version>2.0.1</version>
-      </dependency>
-      <dependency>
-        <groupId>com.squarespace.jersey2-guice</groupId>
-        <artifactId>jersey2-guice-impl</artifactId>
-        <version>1.0.6</version>
-      </dependency>
-      <dependency>
-        <groupId>io.dropwizard.metrics</groupId>
-        <artifactId>metrics-healthchecks</artifactId>
-        <version>3.1.2</version>
-      </dependency>
-      <dependency>
-        <groupId>joda-time</groupId>
-        <artifactId>joda-time</artifactId>
-        <version>2.9.3</version>
-      </dependency>
-      <dependency>
-        <groupId>org.jboss.logging</groupId>
-        <artifactId>jboss-logging</artifactId>
-        <version>3.2.1.Final</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
 
   <dependencies>
     <dependency>
@@ -149,7 +57,6 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
-
     <dependency>
       <groupId>io.dropwizard</groupId>
       <artifactId>dropwizard-servlets</artifactId>
