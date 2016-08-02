@@ -10,13 +10,13 @@
 
   <groupId>com.hubspot.dropwizard</groupId>
   <artifactId>dropwizard-guicier</artifactId>
-  <version>1.0.0.3</version>
+  <version>1.0.0.4-SNAPSHOT</version>
 
   <scm>
     <connection>scm:git:git@github.com:HubSpot/dropwizard-guicier.git</connection>
     <developerConnection>scm:git:git@github.com:HubSpot/dropwizard-guicier.git</developerConnection>
     <url>git@github.com:HubSpot/dropwizard-guicier.git</url>
-    <tag>dropwizard-guicier-1.0.0.3</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <developers>
