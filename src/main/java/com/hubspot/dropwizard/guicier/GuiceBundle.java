@@ -39,23 +39,29 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
   private final ImmutableSet<DropwizardAwareModule<T>> dropwizardAwareModules;
   private final ImmutableSet<Module> guiceModules;
   private final Stage guiceStage;
+  private final boolean allowUnknownFields;
 
   private Bootstrap<?> bootstrap = null;
 
   private GuiceBundle(final Class<T> configClass,
                       final ImmutableSet<Module> guiceModules,
                       final ImmutableSet<DropwizardAwareModule<T>> dropwizardAwareModules,
-                      final Stage guiceStage) {
+                      final Stage guiceStage,
+                      final boolean allowUnknownFields) {
     this.configClass = configClass;
 
     this.guiceModules = guiceModules;
     this.dropwizardAwareModules = dropwizardAwareModules;
     this.guiceStage = guiceStage;
+    this.allowUnknownFields = allowUnknownFields;
   }
 
   @Override
   public void initialize(final Bootstrap<?> bootstrap) {
     this.bootstrap = bootstrap;
+    if (allowUnknownFields) {
+      AllowUnknownFieldsObjectMapper.applyTo(bootstrap);
+    }
   }
 
   @Override
@@ -116,6 +122,7 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
     private final ImmutableSet.Builder<Module> guiceModules = ImmutableSet.builder();
     private final ImmutableSet.Builder<DropwizardAwareModule<U>> dropwizardAwareModules = ImmutableSet.builder();
     private Stage guiceStage = Stage.PRODUCTION;
+    private boolean allowUnknownFields = true;
 
     private Builder(final Class<U> configClass) {
       this.configClass = configClass;
@@ -127,6 +134,11 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
         LOG.warn("Guice should only ever run in PRODUCTION mode except for testing!");
       }
       this.guiceStage = guiceStage;
+      return this;
+    }
+
+    public final Builder<U> allowUnknownFields(final boolean allowUnknownFields) {
+      this.allowUnknownFields = allowUnknownFields;
       return this;
     }
 
@@ -147,7 +159,7 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
     }
 
     public final GuiceBundle<U> build() {
-      return new GuiceBundle<U>(configClass, guiceModules.build(), dropwizardAwareModules.build(), guiceStage);
+      return new GuiceBundle<>(configClass, guiceModules.build(), dropwizardAwareModules.build(), guiceStage, allowUnknownFields);
     }
   }
 }

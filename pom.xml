@@ -93,6 +93,10 @@
       <groupId>com.squarespace.jersey2-guice</groupId>
       <artifactId>jersey2-guice-impl</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+    </dependency>
   </dependencies>
 </project>
 
