@@ -16,6 +16,7 @@ import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.Stage;
 import com.google.inject.servlet.GuiceFilter;
+import com.google.inject.servlet.GuiceServletContextListener;
 import com.google.inject.servlet.ServletModule;
 import com.squarespace.jersey2.guice.JerseyGuiceModule;
 import com.squarespace.jersey2.guice.JerseyGuiceUtils;
@@ -105,6 +106,13 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
     dropwizardModule.register(environment, injector);
 
     environment.servlets().addFilter("Guice Filter", GuiceFilter.class).addMappingForUrlPatterns(null, false, environment.getApplicationContext().getContextPath() + "*");
+    environment.servlets().addServletListeners(new GuiceServletContextListener() {
+
+      @Override
+      protected Injector getInjector() {
+        return injector;
+      }
+    });
   }
 
   public static class GuiceEnforcerModule implements Module {
