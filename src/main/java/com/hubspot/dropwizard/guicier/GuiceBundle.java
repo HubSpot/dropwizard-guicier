@@ -105,7 +105,7 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
 
     dropwizardModule.register(environment, injector);
 
-    environment.servlets().addFilter("Guice Filter", GuiceFilter.class).addMappingForUrlPatterns(null, false, environment.getApplicationContext().getContextPath() + "*");
+    environment.servlets().addFilter("Guice Filter", GuiceFilter.class).addMappingForUrlPatterns(null, false, "/*");
     environment.servlets().addServletListeners(new GuiceServletContextListener() {
 
       @Override
