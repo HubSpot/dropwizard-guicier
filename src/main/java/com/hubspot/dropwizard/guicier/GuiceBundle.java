@@ -43,6 +43,7 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
   private final boolean allowUnknownFields;
 
   private Bootstrap<?> bootstrap = null;
+  private Injector injector = null;
 
   private GuiceBundle(final Class<T> configClass,
                       final ImmutableSet<Module> guiceModules,
@@ -75,7 +76,7 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
 
     final DropwizardModule dropwizardModule = new DropwizardModule();
 
-    final Injector injector =
+    this.injector =
         Guice.createInjector(guiceStage,
                 ImmutableSet.<Module>builder()
                         .addAll(guiceModules)
@@ -113,6 +114,10 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
         return injector;
       }
     });
+  }
+
+  public Injector getInjector() {
+    return checkNotNull(injector, "injector has not been initialized yet");
   }
 
   public static class GuiceEnforcerModule implements Module {
