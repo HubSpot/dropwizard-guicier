@@ -5,19 +5,20 @@ import static com.google.common.base.Preconditions.checkState;
 
 import com.google.inject.Module;
 
+import io.dropwizard.Configuration;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 
-public abstract class DropwizardAwareModule<Configuration> implements Module {
+public abstract class DropwizardAwareModule<C extends Configuration> implements Module {
   private volatile Bootstrap<?> bootstrap = null;
-  private volatile Configuration configuration = null;
+  private volatile C configuration = null;
   private volatile Environment environment = null;
 
   protected Bootstrap<?> getBootstrap() {
     return checkNotNull(this.bootstrap, "bootstrap was not set!");
   }
 
-  protected Configuration getConfiguration() {
+  protected C getConfiguration() {
     return checkNotNull(this.configuration, "configuration was not set!");
   }
 
@@ -30,7 +31,7 @@ public abstract class DropwizardAwareModule<Configuration> implements Module {
     this.bootstrap = checkNotNull(bootstrap, "bootstrap is null");
   }
 
-  public void setConfiguration(Configuration configuration) {
+  public void setConfiguration(C configuration) {
     checkState(this.configuration == null, "configuration was already set!");
     this.configuration = checkNotNull(configuration, "configuration is null");
   }
