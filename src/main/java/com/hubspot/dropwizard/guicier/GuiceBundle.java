@@ -41,6 +41,7 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
   private final ImmutableSet<Module> guiceModules;
   private final Stage guiceStage;
   private final boolean allowUnknownFields;
+  private final boolean enableGuiceEnforcer;
 
   private Bootstrap<?> bootstrap = null;
   private Injector injector = null;
@@ -49,13 +50,15 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
                       final ImmutableSet<Module> guiceModules,
                       final ImmutableSet<DropwizardAwareModule<T>> dropwizardAwareModules,
                       final Stage guiceStage,
-                      final boolean allowUnknownFields) {
+                      final boolean allowUnknownFields,
+                      final boolean enableGuiceEnforcer) {
     this.configClass = configClass;
 
     this.guiceModules = guiceModules;
     this.dropwizardAwareModules = dropwizardAwareModules;
     this.guiceStage = guiceStage;
     this.allowUnknownFields = allowUnknownFields;
+    this.enableGuiceEnforcer = enableGuiceEnforcer;
   }
 
   @Override
@@ -76,21 +79,23 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
 
     final DropwizardModule dropwizardModule = new DropwizardModule();
 
-    this.injector =
-        Guice.createInjector(guiceStage,
-                ImmutableSet.<Module>builder()
-                        .addAll(guiceModules)
-                        .addAll(dropwizardAwareModules)
-                        .add(new GuiceEnforcerModule())
-                        .add(new ServletModule())
-                        .add(dropwizardModule)
-                        .add(new Module() {
-                          @Override
-                          public void configure(final Binder binder) {
-                            binder.bind(Environment.class).toInstance(environment);
-                            binder.bind(configClass).toInstance(configuration);
-                          }
-                        }).build());
+    ImmutableSet.Builder<Module> modulesBuilder =
+        ImmutableSet.<Module>builder()
+            .addAll(guiceModules)
+            .addAll(dropwizardAwareModules)
+            .add(new ServletModule())
+            .add(dropwizardModule)
+            .add(new Module() {
+              @Override
+              public void configure(final Binder binder) {
+                binder.bind(Environment.class).toInstance(environment);
+                binder.bind(configClass).toInstance(configuration);
+              }
+            });
+    if (enableGuiceEnforcer) {
+      modulesBuilder.add(new GuiceEnforcerModule());
+    }
+    this.injector = Guice.createInjector(guiceStage, modulesBuilder.build());
 
     JerseyGuiceUtils.install(new ServiceLocatorGenerator() {
 
@@ -136,6 +141,7 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
     private final ImmutableSet.Builder<DropwizardAwareModule<U>> dropwizardAwareModules = ImmutableSet.builder();
     private Stage guiceStage = Stage.PRODUCTION;
     private boolean allowUnknownFields = true;
+    private boolean enableGuiceEnforcer = true;
 
     private Builder(final Class<U> configClass) {
       this.configClass = configClass;
@@ -152,6 +158,11 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
 
     public final Builder<U> allowUnknownFields(final boolean allowUnknownFields) {
       this.allowUnknownFields = allowUnknownFields;
+      return this;
+    }
+
+    public final Builder<U> enableGuiceEnforcer(final boolean enableGuiceEnforcer) {
+      this.enableGuiceEnforcer = enableGuiceEnforcer;
       return this;
     }
 
@@ -172,7 +183,12 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
     }
 
     public final GuiceBundle<U> build() {
-      return new GuiceBundle<>(configClass, guiceModules.build(), dropwizardAwareModules.build(), guiceStage, allowUnknownFields);
+      return new GuiceBundle<>(configClass,
+                               guiceModules.build(),
+                               dropwizardAwareModules.build(),
+                               guiceStage,
+                               allowUnknownFields,
+                               enableGuiceEnforcer);
     }
   }
 }
