@@ -1,7 +1,6 @@
 package com.hubspot.dropwizard.guicier;
 
 import com.codahale.metrics.health.HealthCheck;
-import com.google.common.collect.ImmutableSet;
 import com.google.inject.Binder;
 import com.google.inject.Injector;
 import com.google.inject.Key;
@@ -27,10 +26,11 @@ import java.lang.reflect.Type;
 public class DropwizardModule implements Module {
   private static final Logger LOG = LoggerFactory.getLogger(DropwizardModule.class);
 
-  private final ImmutableSet.Builder<Managed> managedBuilder = ImmutableSet.builder();
-  private final ImmutableSet.Builder<Task> taskBuilder = ImmutableSet.builder();
-  private final ImmutableSet.Builder<HealthCheck> healthcheckBuilder = ImmutableSet.builder();
-  private final ImmutableSet.Builder<ServerLifecycleListener> serverLifecycleListenerBuilder = ImmutableSet.builder();
+  private final Environment environment;
+
+  public DropwizardModule(Environment environment) {
+    this.environment = environment;
+  }
 
   @Override
   public void configure(final Binder binder) {
@@ -42,19 +42,19 @@ public class DropwizardModule implements Module {
           @Override
           public void afterInjection(T obj) {
             if (obj instanceof Managed) {
-              managedBuilder.add((Managed) obj);
+              handle((Managed) obj);
             }
 
             if (obj instanceof Task) {
-              taskBuilder.add((Task) obj);
+              handle((Task) obj);
             }
 
             if (obj instanceof HealthCheck) {
-              healthcheckBuilder.add((HealthCheck) obj);
+              handle((HealthCheck) obj);
             }
 
             if (obj instanceof ServerLifecycleListener) {
-              serverLifecycleListenerBuilder.add((ServerLifecycleListener) obj);
+              handle((ServerLifecycleListener) obj);
             }
           }
         });
@@ -62,28 +62,28 @@ public class DropwizardModule implements Module {
     });
   }
 
-  public void register(Environment environment, Injector injector) {
+  public void register(Injector injector) {
     registerResourcesAndProviders(environment.jersey().getResourceConfig(), injector);
+  }
 
-    for (Managed managed : managedBuilder.build()) {
-      environment.lifecycle().manage(managed);
-      LOG.info("Added guice injected managed Object: {}", managed.getClass().getName());
-    }
+  private void handle(Managed managed) {
+    environment.lifecycle().manage(managed);
+    LOG.info("Added guice injected managed Object: {}", managed.getClass().getName());
+  }
 
-    for (Task task : taskBuilder.build()) {
-      environment.admin().addTask(task);
-      LOG.info("Added guice injected Task: {}", task.getClass().getName());
-    }
+  private void handle(Task task) {
+    environment.admin().addTask(task);
+    LOG.info("Added guice injected Task: {}", task.getClass().getName());
+  }
 
-    for (HealthCheck healthcheck : healthcheckBuilder.build()) {
-      environment.healthChecks().register(healthcheck.getClass().getSimpleName(), healthcheck);
-      LOG.info("Added guice injected health check: {}", healthcheck.getClass().getName());
-    }
+  private void handle(HealthCheck healthcheck) {
+    environment.healthChecks().register(healthcheck.getClass().getSimpleName(), healthcheck);
+    LOG.info("Added guice injected health check: {}", healthcheck.getClass().getName());
+  }
 
-    for (ServerLifecycleListener serverLifecycleListener : serverLifecycleListenerBuilder.build()) {
-      environment.lifecycle().addServerLifecycleListener(serverLifecycleListener);
-      LOG.info("Added guice injected server lifecycle listener: {}", serverLifecycleListener.getClass().getName());
-    }
+  private void handle(ServerLifecycleListener serverLifecycleListener) {
+    environment.lifecycle().addServerLifecycleListener(serverLifecycleListener);
+    LOG.info("Added guice injected server lifecycle listener: {}", serverLifecycleListener.getClass().getName());
   }
 
   private void registerResourcesAndProviders(ResourceConfig config, Injector injector) {

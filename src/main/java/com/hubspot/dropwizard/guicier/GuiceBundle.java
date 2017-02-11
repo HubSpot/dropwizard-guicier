@@ -79,7 +79,7 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
       dropwizardAwareModule.setEnvironment(environment);
     }
 
-    final DropwizardModule dropwizardModule = new DropwizardModule();
+    final DropwizardModule dropwizardModule = new DropwizardModule(environment);
 
     final Injector injector =
         Guice.createInjector(guiceStage,
@@ -108,7 +108,7 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
     injector.injectMembers(this);
     checkState(replacer != null, "No guice container replacer was injected!");
 
-    dropwizardModule.register(environment, injector);
+    dropwizardModule.register(injector);
 
     environment.jersey().replace(replacer);
     environment.servlets().addFilter("Guice Filter", GuiceFilter.class).addMappingForUrlPatterns(null, false, environment.getApplicationContext().getContextPath() + "*");
