@@ -98,7 +98,7 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
     this.injector = Guice.createInjector(guiceStage, modulesBuilder.build());
 
     JerseyGuiceUtils.install(new ServiceLocatorGenerator() {
-      
+
       @Override
       public ServiceLocator create(String name, ServiceLocator parent) {
         if (!name.startsWith("__HK2_Generated_")) {
