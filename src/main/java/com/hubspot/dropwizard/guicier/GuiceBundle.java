@@ -77,7 +77,7 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
       dropwizardAwareModule.setEnvironment(environment);
     }
 
-    final DropwizardModule dropwizardModule = new DropwizardModule();
+    final DropwizardModule dropwizardModule = new DropwizardModule(environment);
 
     ImmutableSet.Builder<Module> modulesBuilder =
         ImmutableSet.<Module>builder()
@@ -109,7 +109,7 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
       }
     });
 
-    dropwizardModule.register(environment, injector);
+    dropwizardModule.register(injector);
 
     environment.servlets().addFilter("Guice Filter", GuiceFilter.class).addMappingForUrlPatterns(null, false, "/*");
     environment.servlets().addServletListeners(new GuiceServletContextListener() {
