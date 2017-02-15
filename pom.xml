@@ -5,12 +5,12 @@
   <parent>
     <groupId>com.hubspot</groupId>
     <artifactId>basepom</artifactId>
-    <version>15.1</version>
+    <version>15.6</version>
   </parent>
 
   <groupId>com.hubspot.dropwizard</groupId>
   <artifactId>dropwizard-guicier</artifactId>
-  <version>0.9.1.1-SNAPSHOT</version>
+  <version>1.0.0.7-SNAPSHOT</version>
 
   <scm>
     <connection>scm:git:git@github.com:HubSpot/dropwizard-guicier.git</connection>
@@ -28,97 +28,12 @@
     </developer>
   </developers>
 
-  <properties>
-    <dropwizard.version>0.9.1</dropwizard.version>
-    <hibernate.version>5.2.2.Final</hibernate.version>
-
-    <dep.guava.version>18.0</dep.guava.version>
-    <dep.hk2.version>2.4.0-b31</dep.hk2.version>
-    <dep.jackson.version>2.6.4</dep.jackson.version>
-    <dep.jersey.version>2.22.1</dep.jersey.version>
-    <dep.jetty.version>9.2.13.v20150730</dep.jetty.version>
-  </properties>
-
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.glassfish.jersey.core</groupId>
-        <artifactId>jersey-server</artifactId>
-        <version>${dep.jersey.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.glassfish.hk2.external</groupId>
-            <artifactId>javax.inject</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.glassfish.jersey.containers</groupId>
-        <artifactId>jersey-container-servlet-core</artifactId>
-        <version>${dep.jersey.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.glassfish.hk2.external</groupId>
-            <artifactId>javax.inject</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.glassfish.hk2</groupId>
-        <artifactId>hk2-api</artifactId>
-        <version>${dep.hk2.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.glassfish.hk2.external</groupId>
-            <artifactId>aopalliance-repackaged</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.glassfish.hk2</groupId>
-        <artifactId>hk2-locator</artifactId>
-        <version>${dep.hk2.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.glassfish.hk2.external</groupId>
-            <artifactId>aopalliance-repackaged</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.glassfish.hk2</groupId>
-        <artifactId>hk2-utils</artifactId>
-        <version>${dep.hk2.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>javax.ws.rs</groupId>
-        <artifactId>javax.ws.rs-api</artifactId>
-        <version>2.0.1</version>
-      </dependency>
-      <dependency>
-        <groupId>com.squarespace.jersey2-guice</groupId>
-        <artifactId>jersey2-guice</artifactId>
-        <version>0.10</version>
-      </dependency>
-      <dependency>
-        <groupId>io.dropwizard.metrics</groupId>
-        <artifactId>metrics-healthchecks</artifactId>
-        <version>3.1.2</version>
-      </dependency>
-      <dependency>
-        <groupId>joda-time</groupId>
-        <artifactId>joda-time</artifactId>
-        <version>2.9</version>
-      </dependency>
-      <dependency>
-        <groupId>org.jboss.logging</groupId>
-        <artifactId>jboss-logging</artifactId>
-        <version>3.2.1.Final</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-
   <dependencies>
+    <!-- Put this dep first so the ServiceLoader returns its classes first -->
+    <dependency>
+      <groupId>com.squarespace.jersey2-guice</groupId>
+      <artifactId>jersey2-guice-impl</artifactId>
+    </dependency>
     <dependency>
       <groupId>com.google.inject</groupId>
       <artifactId>guice</artifactId>
@@ -136,10 +51,6 @@
       <artifactId>guava</artifactId>
     </dependency>
     <dependency>
-      <groupId>javax.inject</groupId>
-      <artifactId>javax.inject</artifactId>
-    </dependency>
-    <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
     </dependency>
@@ -151,7 +62,6 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
-
     <dependency>
       <groupId>io.dropwizard</groupId>
       <artifactId>dropwizard-servlets</artifactId>
@@ -181,16 +91,12 @@
       <artifactId>jersey-server</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.glassfish.jersey.containers</groupId>
-      <artifactId>jersey-container-servlet-core</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.glassfish.hk2</groupId>
       <artifactId>hk2-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.squarespace.jersey2-guice</groupId>
-      <artifactId>jersey2-guice</artifactId>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
     </dependency>
   </dependencies>
 </project>

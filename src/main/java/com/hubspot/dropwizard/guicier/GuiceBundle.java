@@ -1,30 +1,25 @@
 package com.hubspot.dropwizard.guicier;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 
 import java.util.Arrays;
 
-import javax.inject.Inject;
-import javax.servlet.Servlet;
-
-import org.glassfish.jersey.server.ResourceConfig;
-import org.glassfish.jersey.servlet.ServletContainer;
+import org.glassfish.hk2.api.ServiceLocator;
+import org.glassfish.hk2.extension.ServiceLocatorGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Function;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Binder;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
-import com.google.inject.Scopes;
 import com.google.inject.Stage;
-import com.google.inject.TypeLiteral;
-import com.google.inject.name.Named;
-import com.google.inject.name.Names;
 import com.google.inject.servlet.GuiceFilter;
+import com.google.inject.servlet.GuiceServletContextListener;
+import com.google.inject.servlet.ServletModule;
+import com.squarespace.jersey2.guice.JerseyGuiceModule;
+import com.squarespace.jersey2.guice.JerseyGuiceUtils;
 
 import io.dropwizard.Configuration;
 import io.dropwizard.ConfiguredBundle;
@@ -35,9 +30,6 @@ import io.dropwizard.setup.Environment;
  * @author <a href="mailto:henning@schmiedehausen.org">Henning P. Schmiedehausen</a>
  */
 public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T> {
-  private static final String GUICE_BUNDLE_NAME = "_guice_bundle";
-  private static final Named GUICE_BUNDLE_NAMED = Names.named(GUICE_BUNDLE_NAME);
-
   private static final Logger LOG = LoggerFactory.getLogger(GuiceBundle.class);
 
   public static <U extends Configuration> Builder<U> defaultBuilder(final Class<U> configClass) {
@@ -48,27 +40,33 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
   private final ImmutableSet<DropwizardAwareModule<T>> dropwizardAwareModules;
   private final ImmutableSet<Module> guiceModules;
   private final Stage guiceStage;
+  private final boolean allowUnknownFields;
+  private final boolean enableGuiceEnforcer;
 
   private Bootstrap<?> bootstrap = null;
-
-  @Inject
-  @Named(GUICE_BUNDLE_NAME)
-  private volatile Function<ResourceConfig, Servlet> replacer = null;
+  private Injector injector = null;
 
   private GuiceBundle(final Class<T> configClass,
                       final ImmutableSet<Module> guiceModules,
                       final ImmutableSet<DropwizardAwareModule<T>> dropwizardAwareModules,
-                      final Stage guiceStage) {
+                      final Stage guiceStage,
+                      final boolean allowUnknownFields,
+                      final boolean enableGuiceEnforcer) {
     this.configClass = configClass;
 
     this.guiceModules = guiceModules;
     this.dropwizardAwareModules = dropwizardAwareModules;
     this.guiceStage = guiceStage;
+    this.allowUnknownFields = allowUnknownFields;
+    this.enableGuiceEnforcer = enableGuiceEnforcer;
   }
 
   @Override
   public void initialize(final Bootstrap<?> bootstrap) {
     this.bootstrap = bootstrap;
+    if (allowUnknownFields) {
+      AllowUnknownFieldsObjectMapper.applyTo(bootstrap);
+    }
   }
 
   @Override
@@ -81,51 +79,48 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
 
     final DropwizardModule dropwizardModule = new DropwizardModule(environment);
 
-    final Injector injector =
-        Guice.createInjector(guiceStage,
-                ImmutableSet.<Module>builder()
-                        .addAll(guiceModules)
-                        .addAll(dropwizardAwareModules)
-                        .add(new GuiceEnforcerModule())
-                        .add(new JerseyServletModule())
-                        .add(dropwizardModule)
-                        .add(new Module() {
-                          @Override
-                          public void configure(final Binder binder) {
-                            binder.bind(Environment.class).toInstance(environment);
-                            binder.bind(configClass).toInstance(configuration);
+    ImmutableSet.Builder<Module> modulesBuilder =
+        ImmutableSet.<Module>builder()
+            .addAll(guiceModules)
+            .addAll(dropwizardAwareModules)
+            .add(new ServletModule())
+            .add(dropwizardModule)
+            .add(new Module() {
+              @Override
+              public void configure(final Binder binder) {
+                binder.bind(Environment.class).toInstance(environment);
+                binder.bind(configClass).toInstance(configuration);
+              }
+            });
+    if (enableGuiceEnforcer) {
+      modulesBuilder.add(new GuiceEnforcerModule());
+    }
+    this.injector = Guice.createInjector(guiceStage, modulesBuilder.build());
 
-                            binder.bind(ServletContainer.class).to(DropwizardGuiceContainer.class);
+      @Override
+      public ServiceLocator create(String name, ServiceLocator parent) {
+        if (!name.startsWith("__HK2_Generated_")) {
+          return null;
+        }
 
-                            binder.bind(new TypeLiteral<Function<ResourceConfig, Servlet>>() {
-                            })
-                                    .annotatedWith(GUICE_BUNDLE_NAMED)
-                                    .to(GuiceContainerReplacer.class)
-                                    .in(Scopes.SINGLETON);
-                          }
-                        }).build());
-
-    injector.injectMembers(this);
-    checkState(replacer != null, "No guice container replacer was injected!");
+        return injector.createChildInjector(new JerseyGuiceModule(name)).getInstance(ServiceLocator.class);
+      }
+    });
 
     dropwizardModule.register(injector);
 
-    environment.jersey().replace(replacer);
-    environment.servlets().addFilter("Guice Filter", GuiceFilter.class).addMappingForUrlPatterns(null, false, environment.getApplicationContext().getContextPath() + "*");
+    environment.servlets().addFilter("Guice Filter", GuiceFilter.class).addMappingForUrlPatterns(null, false, "/*");
+    environment.servlets().addServletListeners(new GuiceServletContextListener() {
+
+      @Override
+      protected Injector getInjector() {
+        return injector;
+      }
+    });
   }
 
-  private static class GuiceContainerReplacer implements Function<ResourceConfig, Servlet> {
-    private final ServletContainer container;
-
-    @Inject
-    GuiceContainerReplacer(final ServletContainer container) {
-      this.container = checkNotNull(container, "container is null");
-    }
-
-    @Override
-    public Servlet apply(final ResourceConfig resourceConfig) {
-      return container;
-    }
+  public Injector getInjector() {
+    return checkNotNull(injector, "injector has not been initialized yet");
   }
 
   public static class GuiceEnforcerModule implements Module {
@@ -143,6 +138,8 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
     private final ImmutableSet.Builder<Module> guiceModules = ImmutableSet.builder();
     private final ImmutableSet.Builder<DropwizardAwareModule<U>> dropwizardAwareModules = ImmutableSet.builder();
     private Stage guiceStage = Stage.PRODUCTION;
+    private boolean allowUnknownFields = true;
+    private boolean enableGuiceEnforcer = true;
 
     private Builder(final Class<U> configClass) {
       this.configClass = configClass;
@@ -154,6 +151,16 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
         LOG.warn("Guice should only ever run in PRODUCTION mode except for testing!");
       }
       this.guiceStage = guiceStage;
+      return this;
+    }
+
+    public final Builder<U> allowUnknownFields(final boolean allowUnknownFields) {
+      this.allowUnknownFields = allowUnknownFields;
+      return this;
+    }
+
+    public final Builder<U> enableGuiceEnforcer(final boolean enableGuiceEnforcer) {
+      this.enableGuiceEnforcer = enableGuiceEnforcer;
       return this;
     }
 
@@ -174,7 +181,12 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
     }
 
     public final GuiceBundle<U> build() {
-      return new GuiceBundle<U>(configClass, guiceModules.build(), dropwizardAwareModules.build(), guiceStage);
+      return new GuiceBundle<>(configClass,
+                               guiceModules.build(),
+                               dropwizardAwareModules.build(),
+                               guiceStage,
+                               allowUnknownFields,
+                               enableGuiceEnforcer);
     }
   }
 }
