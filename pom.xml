@@ -5,12 +5,12 @@
   <parent>
     <groupId>com.hubspot</groupId>
     <artifactId>basepom</artifactId>
-    <version>15.8</version>
+    <version>15.11</version>
   </parent>
 
   <groupId>com.hubspot.dropwizard</groupId>
   <artifactId>dropwizard-guicier</artifactId>
-  <version>1.0.2.1-SNAPSHOT</version>
+  <version>1.0.6.0-SNAPSHOT</version>
 
   <scm>
     <connection>scm:git:git@github.com:HubSpot/dropwizard-guicier.git</connection>
