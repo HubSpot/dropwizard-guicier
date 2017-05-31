@@ -146,12 +146,7 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
     private Stage guiceStage = Stage.PRODUCTION;
     private boolean allowUnknownFields = true;
     private boolean enableGuiceEnforcer = true;
-    private InjectorFactory injectorFactory = new InjectorFactory() {
-      @Override
-      public Injector create(Stage stage, Module module) {
-        return Guice.createInjector(stage, module);
-      }
-    };
+    private InjectorFactory injectorFactory = Guice::createInjector;
 
     private Builder(final Class<U> configClass) {
       this.configClass = configClass;
