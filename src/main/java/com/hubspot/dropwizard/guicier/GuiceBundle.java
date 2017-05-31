@@ -18,6 +18,7 @@ import com.google.inject.Stage;
 import com.google.inject.servlet.GuiceFilter;
 import com.google.inject.servlet.GuiceServletContextListener;
 import com.google.inject.servlet.ServletModule;
+import com.google.inject.util.Modules;
 import com.squarespace.jersey2.guice.JerseyGuiceModule;
 import com.squarespace.jersey2.guice.JerseyGuiceUtils;
 
@@ -42,6 +43,7 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
   private final Stage guiceStage;
   private final boolean allowUnknownFields;
   private final boolean enableGuiceEnforcer;
+  private final InjectorFactory injectorFactory;
 
   private Bootstrap<?> bootstrap = null;
   private Injector injector = null;
@@ -51,7 +53,8 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
                       final ImmutableSet<DropwizardAwareModule<T>> dropwizardAwareModules,
                       final Stage guiceStage,
                       final boolean allowUnknownFields,
-                      final boolean enableGuiceEnforcer) {
+                      final boolean enableGuiceEnforcer,
+                      final InjectorFactory injectorFactory) {
     this.configClass = configClass;
 
     this.guiceModules = guiceModules;
@@ -59,6 +62,7 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
     this.guiceStage = guiceStage;
     this.allowUnknownFields = allowUnknownFields;
     this.enableGuiceEnforcer = enableGuiceEnforcer;
+    this.injectorFactory = injectorFactory;
   }
 
   @Override
@@ -95,7 +99,7 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
     if (enableGuiceEnforcer) {
       modulesBuilder.add(new GuiceEnforcerModule());
     }
-    this.injector = Guice.createInjector(guiceStage, modulesBuilder.build());
+    this.injector = injectorFactory.create(guiceStage, Modules.combine(modulesBuilder.build()));
 
     JerseyGuiceUtils.install(new ServiceLocatorGenerator() {
 
@@ -142,6 +146,12 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
     private Stage guiceStage = Stage.PRODUCTION;
     private boolean allowUnknownFields = true;
     private boolean enableGuiceEnforcer = true;
+    private InjectorFactory injectorFactory = new InjectorFactory() {
+      @Override
+      public Injector create(Stage stage, Module module) {
+        return Guice.createInjector(stage, module);
+      }
+    };
 
     private Builder(final Class<U> configClass) {
       this.configClass = configClass;
@@ -182,13 +192,19 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
       return this;
     }
 
+    public final Builder<U> injectorFactory(final InjectorFactory injectorFactory) {
+      this.injectorFactory = injectorFactory;
+      return this;
+    }
+
     public final GuiceBundle<U> build() {
       return new GuiceBundle<>(configClass,
                                guiceModules.build(),
                                dropwizardAwareModules.build(),
                                guiceStage,
                                allowUnknownFields,
-                               enableGuiceEnforcer);
+                               enableGuiceEnforcer,
+                               injectorFactory);
     }
   }
 }
