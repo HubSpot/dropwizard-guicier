@@ -1,43 +1,46 @@
 package com.hubspot.dropwizard.guicier;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.*;
 
 import javax.servlet.ServletException;
 
 import org.glassfish.hk2.api.ServiceLocator;
 import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
+import org.junit.Before;
 import org.junit.Test;
 
+import com.codahale.metrics.MetricRegistry;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Injector;
-import com.squarespace.jersey2.guice.JerseyGuiceUtils;
-
 import com.hubspot.dropwizard.guicier.objects.ExplicitResource;
 import com.hubspot.dropwizard.guicier.objects.TestModule;
-import io.dropwizard.Application;
+import com.squarespace.jersey2.guice.JerseyGuiceUtils;
+
 import io.dropwizard.Configuration;
+import io.dropwizard.jackson.Jackson;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 
-@Ignore
 public class HK2LinkerTest {
 
-    private static Injector injector;
-    final ServiceLocator serviceLocator = injector.getInstance(ServiceLocator.class);
+    private Injector injector;
+    private ServiceLocator serviceLocator;
 
-    @BeforeClass
-    public static void setup() {
+    @Before
+    public void setup() throws Exception {
+        ObjectMapper objectMapper = Jackson.newObjectMapper();
+        Environment environment = new Environment("test env", objectMapper, null, new MetricRegistry(), null);
+        GuiceBundle guiceBundle = GuiceBundle.defaultBuilder(Configuration.class)
+            .modules(new TestModule())
+            .build();
+        Bootstrap bootstrap = mock(Bootstrap.class);
+        when(bootstrap.getObjectMapper()).thenReturn(objectMapper);
+        guiceBundle.initialize(bootstrap);
+        guiceBundle.run(new Configuration(), environment);
 
-        final GuiceBundle bundle = GuiceBundle.defaultBuilder(Configuration.class).modules(new TestModule()).build();
-        bundle.initialize(new Bootstrap<Configuration>(new Application<Configuration>() {
-            @Override
-            public void run(Configuration configuration, Environment environment) throws Exception {
-
-            }
-        }));
-        injector = bundle.getInjector();
-
+        injector = guiceBundle.getInjector();
+        serviceLocator = injector.getInstance(ServiceLocator.class);
     }
 
     @AfterClass
@@ -47,10 +50,8 @@ public class HK2LinkerTest {
 
     @Test
     public void explicitGuiceBindingsAreBridgedToHk2() throws ServletException {
-        // when
         ExplicitResource resource = serviceLocator.createAndInitialize(ExplicitResource.class);
 
-        // then
         assertThat(resource).isNotNull();
         assertThat(resource.getDAO()).isNotNull();
     }

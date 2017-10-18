@@ -2,10 +2,11 @@ package com.hubspot.dropwizard.guicier;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.lang.reflect.Field;
 import java.util.Arrays;
 
 import org.glassfish.hk2.api.ServiceLocator;
-import org.glassfish.hk2.extension.ServiceLocatorGenerator;
+import org.glassfish.hk2.internal.ServiceLocatorFactoryImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,13 +83,15 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
     }
 
     final DropwizardModule dropwizardModule = new DropwizardModule(environment);
-
+    // We assume that the next service locator will be the main application one
+    final String serviceLocatorName = getNextServiceLocatorName();
     ImmutableSet.Builder<Module> modulesBuilder =
         ImmutableSet.<Module>builder()
             .addAll(guiceModules)
             .addAll(dropwizardAwareModules)
             .add(new ServletModule())
             .add(dropwizardModule)
+            .add(new JerseyGuiceModule(serviceLocatorName))
             .add(new Module() {
               @Override
               public void configure(final Binder binder) {
@@ -101,15 +104,14 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
     }
     this.injector = injectorFactory.create(guiceStage, Modules.combine(modulesBuilder.build()));
 
-    JerseyGuiceUtils.install(new ServiceLocatorGenerator() {
-
-      @Override
-      public ServiceLocator create(String name, ServiceLocator parent) {
-        if (!name.startsWith("__HK2_Generated_")) {
-          return null;
-        }
-
-        return injector.createChildInjector(new JerseyGuiceModule(name)).getInstance(ServiceLocator.class);
+    JerseyGuiceUtils.install((name, parent) -> {
+      if (!name.startsWith("__HK2_")) {
+        return null;
+      } else if (serviceLocatorName.equals(name)) {
+        return injector.getInstance(ServiceLocator.class);
+      } else {
+        LOG.debug("Returning a new ServiceLocator for name '%s'", name);
+        return JerseyGuiceUtils.newServiceLocator(name, parent);
       }
     });
 
@@ -200,6 +202,23 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
                                allowUnknownFields,
                                enableGuiceEnforcer,
                                injectorFactory);
+    }
+  }
+
+  private static String getNextServiceLocatorName() {
+    Class<ServiceLocatorFactoryImpl> factoryClass = ServiceLocatorFactoryImpl.class;
+    try {
+      Field nameCountField = factoryClass.getDeclaredField("name_count");
+      nameCountField.setAccessible(true);
+      int count = (int) nameCountField.get(null);
+
+      Field namePrefixField = factoryClass.getDeclaredField("GENERATED_NAME_PREFIX");
+      namePrefixField.setAccessible(true);
+      String prefix = (String) namePrefixField.get(null);
+
+      return prefix + count;
+    } catch (NoSuchFieldException | IllegalAccessException e) {
+      throw new RuntimeException(e);
     }
   }
 }
