@@ -11,7 +11,6 @@ import javax.servlet.ServletException;
 import org.glassfish.hk2.api.ServiceLocator;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -59,13 +58,11 @@ public class GuiceBundleTest {
 
     @Test
     public void createsInjectorWhenInit() throws ServletException {
-        //then
         Injector injector = guiceBundle.getInjector();
         assertThat(injector).isNotNull();
     }
 
     @Test
-    @Ignore
     public void serviceLocatorIsAvaliable () throws ServletException {
         ServiceLocator serviceLocator = guiceBundle.getInjector().getInstance(ServiceLocator.class);
         assertThat(serviceLocator).isNotNull();
