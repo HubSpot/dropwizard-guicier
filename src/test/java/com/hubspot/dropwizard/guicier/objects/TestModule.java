@@ -17,6 +17,7 @@ public class TestModule extends AbstractModule {
         bind(InjectedProvider.class);
 
         bind(ExplicitResource.class);
+        bind(JerseyContextResource.class);
     }
 }
 

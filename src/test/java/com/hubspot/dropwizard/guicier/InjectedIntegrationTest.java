@@ -12,6 +12,7 @@ import org.junit.ClassRule;
 import org.junit.Test;
 
 import com.google.common.io.Resources;
+import com.hubspot.dropwizard.guicier.objects.HK2ContextBindings;
 import com.hubspot.dropwizard.guicier.objects.TestApplication;
 import com.squarespace.jersey2.guice.JerseyGuiceUtils;
 
@@ -47,14 +48,25 @@ public class InjectedIntegrationTest {
 
     @Test
     public void shouldGetExplicitMessage() {
-
-        // when
-        final String message = client.target(
-                String.format("http://localhost:%d//explicit/message", RULE.getLocalPort()))
-                .request()
-                .get(String.class);
-
-        // then
+        String message = client.target(getUri("/explicit/message")).request().get(String.class);
         assertThat(message).isEqualTo("this DAO was bound explicitly");
+    }
+
+    @Test
+    public void hk2ContextBindingsAreResolvableInGuice() {
+        for (Class<?> clazz : HK2ContextBindings.SET) {
+            boolean resolvable = client.target(getUri("/jersey-context/is-resolvable-by-guice"))
+                .queryParam("className", clazz.getName())
+                .request()
+                .get(Boolean.class);
+            assertThat(resolvable)
+                .as("%s is resolvable by Guice", clazz.getName())
+                .isTrue();
+        }
+    }
+
+    private static String getUri(String path) {
+        String domain = "http://localhost:" + RULE.getLocalPort();
+        return domain + (path.startsWith("/") ? "" : "/") + path;
     }
 }
