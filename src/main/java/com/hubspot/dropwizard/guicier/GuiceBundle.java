@@ -92,6 +92,7 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
             .add(new ServletModule())
             .add(dropwizardModule)
             .add(new JerseyGuiceModule(serviceLocatorName))
+            .add(new JerseyGuicierModule())
             .add(new Module() {
               @Override
               public void configure(final Binder binder) {
