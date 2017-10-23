@@ -12,8 +12,11 @@ import org.junit.Test;
 
 import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.inject.Binding;
 import com.google.inject.Injector;
+import com.google.inject.Key;
 import com.hubspot.dropwizard.guicier.objects.ExplicitResource;
+import com.hubspot.dropwizard.guicier.objects.HK2ContextBindings;
 import com.hubspot.dropwizard.guicier.objects.TestModule;
 import com.squarespace.jersey2.guice.JerseyGuiceUtils;
 
@@ -54,5 +57,15 @@ public class HK2LinkerTest {
 
         assertThat(resource).isNotNull();
         assertThat(resource.getDAO()).isNotNull();
+    }
+
+    @Test
+    public void contextBindingsAreBridgedToGuice() {
+        for (Class<?> clazz : HK2ContextBindings.SET) {
+            Binding binding = injector.getExistingBinding(Key.get(clazz));
+            assertThat(binding)
+                .as("%s has a Guice binding", clazz.getName())
+                .isNotNull();
+        }
     }
 }
