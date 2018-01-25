@@ -157,9 +157,6 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
 
     public final Builder<U> stage(final Stage guiceStage) {
       checkNotNull(guiceStage, "guiceStage is null");
-      if (guiceStage != Stage.PRODUCTION) {
-        LOG.warn("Guice should only ever run in PRODUCTION mode except for testing!");
-      }
       this.guiceStage = guiceStage;
       return this;
     }
