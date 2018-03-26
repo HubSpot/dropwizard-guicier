@@ -1,10 +1,9 @@
 package com.hubspot.dropwizard.guicier;
 
 import com.codahale.metrics.health.HealthCheck;
-import com.google.inject.Binder;
 import com.google.inject.Injector;
 import com.google.inject.Key;
-import com.google.inject.Module;
+import com.google.inject.AbstractModule;
 import com.google.inject.TypeLiteral;
 import com.google.inject.matcher.Matchers;
 import com.google.inject.spi.InjectionListener;
@@ -23,7 +22,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.ext.Provider;
 import java.lang.reflect.Type;
 
-public class DropwizardModule implements Module {
+public class DropwizardModule extends AbstractModule {
   private static final Logger LOG = LoggerFactory.getLogger(DropwizardModule.class);
 
   private final Environment environment;
@@ -33,8 +32,8 @@ public class DropwizardModule implements Module {
   }
 
   @Override
-  public void configure(final Binder binder) {
-    binder.bindListener(Matchers.any(), new TypeListener() {
+  public void configure() {
+    bindListener(Matchers.any(), new TypeListener() {
       @Override
       public <T> void hear(TypeLiteral<T> type, TypeEncounter<T> encounter) {
         encounter.register(new InjectionListener<T>() {
