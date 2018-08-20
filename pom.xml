@@ -59,6 +59,7 @@
         <artifactId>jsr305</artifactId>
         <version>3.0.2</version>
       </dependency>
+      <!-- Redefined here in order to drop the snakeyaml exclusion -->
       <dependency>
         <groupId>com.fasterxml.jackson.dataformat</groupId>
         <artifactId>jackson-dataformat-yaml</artifactId>
