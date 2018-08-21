@@ -8,7 +8,7 @@ A Dropwizard bundle to handle Guice integration.
         <dependency>
             <groupId>com.hubspot.dropwizard</groupId>
             <artifactId>dropwizard-guicier</artifactId>
-            <version>1.0.9.1</version>
+            <version>1.3.5.0</version>
         </dependency>
     </dependencies>
 ```
