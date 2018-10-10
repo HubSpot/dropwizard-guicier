@@ -5,11 +5,8 @@ import com.google.inject.Binder;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.Module;
-import com.google.inject.TypeLiteral;
 import com.google.inject.matcher.Matchers;
-import com.google.inject.spi.InjectionListener;
-import com.google.inject.spi.TypeEncounter;
-import com.google.inject.spi.TypeListener;
+import com.google.inject.spi.ProvisionListener;
 import io.dropwizard.lifecycle.Managed;
 import io.dropwizard.lifecycle.ServerLifecycleListener;
 import io.dropwizard.servlets.tasks.Task;
@@ -34,30 +31,26 @@ public class DropwizardModule implements Module {
 
   @Override
   public void configure(final Binder binder) {
-    binder.bindListener(Matchers.any(), new TypeListener() {
+    binder.bindListener(Matchers.any(), new ProvisionListener() {
       @Override
-      public <T> void hear(TypeLiteral<T> type, TypeEncounter<T> encounter) {
-        encounter.register(new InjectionListener<T>() {
+      public <T> void onProvision(ProvisionInvocation<T> provision) {
+        Object obj = provision.provision();
 
-          @Override
-          public void afterInjection(T obj) {
-            if (obj instanceof Managed) {
-              handle((Managed) obj);
-            }
+        if (obj instanceof Managed) {
+          handle((Managed) obj);
+        }
 
-            if (obj instanceof Task) {
-              handle((Task) obj);
-            }
+        if (obj instanceof Task) {
+          handle((Task) obj);
+        }
 
-            if (obj instanceof HealthCheck) {
-              handle((HealthCheck) obj);
-            }
+        if (obj instanceof HealthCheck) {
+          handle((HealthCheck) obj);
+        }
 
-            if (obj instanceof ServerLifecycleListener) {
-              handle((ServerLifecycleListener) obj);
-            }
-          }
-        });
+        if (obj instanceof ServerLifecycleListener) {
+          handle((ServerLifecycleListener) obj);
+        }
       }
     });
   }

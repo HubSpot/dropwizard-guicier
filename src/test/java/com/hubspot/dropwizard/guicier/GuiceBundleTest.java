@@ -8,6 +8,11 @@ import java.util.function.Function;
 
 import javax.servlet.ServletException;
 
+import com.hubspot.dropwizard.guicier.objects.ProvidedHealthCheck;
+import com.hubspot.dropwizard.guicier.objects.ProvidedManaged;
+import com.hubspot.dropwizard.guicier.objects.ProvidedProvider;
+import com.hubspot.dropwizard.guicier.objects.ProvidedServerLifecycleListener;
+import com.hubspot.dropwizard.guicier.objects.ProvidedTask;
 import org.glassfish.hk2.api.ServiceLocator;
 import org.junit.After;
 import org.junit.Before;
@@ -112,5 +117,45 @@ public class GuiceBundleTest {
     public void itAddsBoundResource() {
         Set<Class<?>> resourceClasses = environment.jersey().getResourceConfig().getClasses();
         assertThat(resourceClasses).containsOnlyOnce(ExplicitResource.class);
+    }
+
+    @Test
+    public void itAddsProvidedManaged() {
+        ProvidedManaged providedManaged = guiceBundle.getInjector().getInstance(ProvidedManaged.class);
+        assertThat(environment.lifecycle().getManagedObjects())
+            .extracting("managed")
+            .containsOnlyOnce(providedManaged);
+    }
+
+    @Test
+    public void itAddsProvidedTask() {
+        ProvidedTask providedTask = guiceBundle.getInjector().getInstance(ProvidedTask.class);
+        assertThat(environment.admin())
+            .extracting("tasks")
+            .flatExtracting("tasks")
+            .containsOnlyOnce(providedTask);
+    }
+
+    @Test
+    public void itAddsProvidedHealthCheck() {
+        assertThat(environment.healthChecks().getNames())
+            .containsOnlyOnce(ProvidedHealthCheck.class.getSimpleName());
+    }
+
+    @Test
+    public void itAddsProvidedServerLifecycleListener() {
+        ProvidedServerLifecycleListener providedServerLifecycleListener =
+            guiceBundle.getInjector().getInstance(ProvidedServerLifecycleListener.class);
+        assertThat(environment.lifecycle())
+            .extracting(Function.identity())
+            .flatExtracting("lifecycleListeners")
+            .extracting("listener")
+            .containsOnlyOnce(providedServerLifecycleListener);
+    }
+
+    @Test
+    public void itAddsProvidedProvider() {
+        Set<Class<?>> components = environment.jersey().getResourceConfig().getClasses();
+        assertThat(components).containsOnlyOnce(ProvidedProvider.class);
     }
 }
