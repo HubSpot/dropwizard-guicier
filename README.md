@@ -48,7 +48,7 @@ There is an [example project](https://github.com/jhaber/dropwizard-guicier-examp
 going right away. 
 
 ## Upgrading from dropwizard-guice
-There are a couple important changes to be aware of if you are upgradingn from [dropwizard-guice](https://github.com/HubSpot/dropwizard-guice).
+There are a couple important changes to be aware of when upgrading from [dropwizard-guice](https://github.com/HubSpot/dropwizard-guice).
 
 ### AutoConfig has been removed
 [Reasoning and potential workarounds here](https://github.com/HubSpot/dropwizard-guicier/issues/41). The workarounds are however, not recommended.
