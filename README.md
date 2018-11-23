@@ -47,4 +47,15 @@ binding, [for example](https://github.com/jhaber/dropwizard-guicier-example/blob
 There is an [example project](https://github.com/jhaber/dropwizard-guicier-example) you can clone and play with if you'd like to get
 going right away. 
 
+## Upgrading from dropwizard-guice
+There are a couple important changes to be aware of if you are upgradingn from [dropwizard-guice](https://github.com/HubSpot/dropwizard-guice).
+
+### AutoConfig has been removed
+[Reasoning and potential workarounds here](https://github.com/HubSpot/dropwizard-guicier/issues/41). The workarounds are however, not recommended.
+
+### Explicit Bindings Required
+All objects that you wish to inject must be explicitly bound. Just-in-time bindings are not supported by default. This is the case despite you enabling explicit binnding in your own module.
+
+You can however (albeit not recommended) disable the explicit binding behavior by setting `enableGuiceEnforcer(false)` on the `GuiceBundle` within your DW application.
+
 Enjoy!
