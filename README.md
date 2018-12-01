@@ -54,7 +54,7 @@ There are a couple important changes to be aware of when upgrading from [dropwiz
 [Reasoning and potential workarounds here](https://github.com/HubSpot/dropwizard-guicier/issues/41). The workarounds are however, not recommended.
 
 ### Explicit Bindings Required
-All objects that you wish to inject must be explicitly bound. Just-in-time bindings are not supported by default. This is the case despite you enabling explicit binding in your own module.
+All objects that you wish to inject must be explicitly bound. Just-in-time bindings are not supported by default. This is the case despite you **not** enabling explicit binding in your own module.
 
 You can however (albeit not recommended) disable the explicit binding behavior by setting `enableGuiceEnforcer(false)` on the `GuiceBundle` within your DW application.
 
