@@ -19,7 +19,6 @@ import com.google.inject.Stage;
 import com.google.inject.servlet.GuiceFilter;
 import com.google.inject.servlet.GuiceServletContextListener;
 import com.google.inject.servlet.ServletModule;
-import com.google.inject.util.Modules;
 import com.squarespace.jersey2.guice.JerseyGuiceModule;
 import com.squarespace.jersey2.guice.JerseyGuiceUtils;
 
@@ -93,17 +92,14 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
             .add(dropwizardModule)
             .add(new JerseyGuiceModule(serviceLocatorName))
             .add(new JerseyGuicierModule())
-            .add(new Module() {
-              @Override
-              public void configure(final Binder binder) {
-                binder.bind(Environment.class).toInstance(environment);
-                binder.bind(configClass).toInstance(configuration);
-              }
+            .add(binder -> {
+              binder.bind(Environment.class).toInstance(environment);
+              binder.bind(configClass).toInstance(configuration);
             });
     if (enableGuiceEnforcer) {
       modulesBuilder.add(new GuiceEnforcerModule());
     }
-    this.injector = injectorFactory.create(guiceStage, Modules.combine(modulesBuilder.build()));
+    this.injector = injectorFactory.create(guiceStage, modulesBuilder.build());
 
     JerseyGuiceUtils.install((name, parent) -> {
       if (!name.startsWith("__HK2_")) {
@@ -111,7 +107,7 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
       } else if (serviceLocatorName.equals(name)) {
         return injector.getInstance(ServiceLocator.class);
       } else {
-        LOG.debug("Returning a new ServiceLocator for name '%s'", name);
+        LOG.debug("Returning a new ServiceLocator for name '{}'", name);
         return JerseyGuiceUtils.newServiceLocator(name, parent);
       }
     });
