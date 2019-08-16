@@ -47,4 +47,11 @@ binding, [for example](https://github.com/jhaber/dropwizard-guicier-example/blob
 There is an [example project](https://github.com/jhaber/dropwizard-guicier-example) you can clone and play with if you'd like to get
 going right away. 
 
-Enjoy!
+## Upgrading from dropwizard-guice
+There are a couple important changes to be aware of when upgrading from [dropwizard-guice](https://github.com/HubSpot/dropwizard-guice).
+
+### AutoConfig has been removed
+Reasoning and potential workarounds are discussed [here](https://github.com/HubSpot/dropwizard-guicier/issues/41) (fwiw we've ditched AutoConfig internally and have never looked back).
+
+### Explicit Bindings Required
+By default, dropwizard-guicier installs a [module](https://github.com/mgreene/dropwizard-guicier/blob/278056ff871116db844126a41711155d91900011/src/main/java/com/hubspot/dropwizard/guicier/GuiceBundle.java#L135-L143) which makes Guice run in a more strict mode. In particular, just-in-time bindings are disabled and all objects must be explicitly bound. In addition, it requires that no-arg constructors are annotated with `@Inject` for Guice to use them. You can opt out of having this module installed by calling `enableGuiceEnforcer(false)` when constructing your `GuiceBundle`.
