@@ -11,6 +11,7 @@ import io.dropwizard.lifecycle.Managed;
 import io.dropwizard.lifecycle.ServerLifecycleListener;
 import io.dropwizard.servlets.tasks.Task;
 import io.dropwizard.setup.Environment;
+import org.eclipse.jetty.util.component.LifeCycle;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.model.Resource;
 import org.slf4j.Logger;
@@ -51,6 +52,10 @@ public class DropwizardModule implements Module {
         if (obj instanceof ServerLifecycleListener) {
           handle((ServerLifecycleListener) obj);
         }
+
+        if (obj instanceof LifeCycle.Listener) {
+          handle((LifeCycle.Listener) obj);
+        }
       }
     });
   }
@@ -77,6 +82,11 @@ public class DropwizardModule implements Module {
   private void handle(ServerLifecycleListener serverLifecycleListener) {
     environment.lifecycle().addServerLifecycleListener(serverLifecycleListener);
     LOG.info("Added guice injected server lifecycle listener: {}", serverLifecycleListener.getClass().getName());
+  }
+
+  private void handle(LifeCycle.Listener lifecycleListener) {
+    environment.lifecycle().addLifeCycleListener(lifecycleListener);
+    LOG.info("Added guice injected lifecycle listener: {}", lifecycleListener.getClass().getName());
   }
 
   private void registerResourcesAndProviders(ResourceConfig config, Injector injector) {

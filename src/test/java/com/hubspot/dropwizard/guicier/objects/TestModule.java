@@ -22,6 +22,7 @@ public class TestModule extends AbstractModule {
         bind(InjectedTask.class).asEagerSingleton();
         bind(InjectedHealthCheck.class).asEagerSingleton();
         bind(InjectedServerLifecycleListener.class).asEagerSingleton();
+        bind(InjectedLifecycleListener.class).asEagerSingleton();
 
         bind(InjectedProvider.class);
 
@@ -51,6 +52,12 @@ public class TestModule extends AbstractModule {
     @Singleton
     public ProvidedServerLifecycleListener provideServerLifecycleListener() {
         return new ProvidedServerLifecycleListener();
+    }
+
+    @Provides
+    @Singleton
+    public ProvidedLifecycleListener provideLifecycleListener() {
+        return new ProvidedLifecycleListener();
     }
 
     @Provides
