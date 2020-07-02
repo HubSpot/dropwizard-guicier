@@ -123,6 +123,7 @@ public class GuiceBundleTest {
         assertThat(environment.lifecycle())
             .extracting(Function.identity())
             .flatExtracting("lifecycleListeners")
+            .filteredOn(obj -> obj.getClass().getName().contains("ServerListener"))
             .extracting("listener")
             .containsOnlyOnce(injectedServerLifecycleListener);
     }
@@ -179,6 +180,7 @@ public class GuiceBundleTest {
         assertThat(environment.lifecycle())
             .extracting(Function.identity())
             .flatExtracting("lifecycleListeners")
+            .filteredOn(obj -> obj.getClass().getName().contains("ServerListener"))
             .extracting("listener")
             .containsOnlyOnce(providedServerLifecycleListener);
     }
