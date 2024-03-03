@@ -10,6 +10,7 @@ import javax.servlet.ServletException;
 
 import com.hubspot.dropwizard.guicier.objects.InstanceManaged;
 import com.hubspot.dropwizard.guicier.objects.ProvidedHealthCheck;
+import com.hubspot.dropwizard.guicier.objects.ProvidedLifecycleListener;
 import com.hubspot.dropwizard.guicier.objects.ProvidedManaged;
 import com.hubspot.dropwizard.guicier.objects.ProvidedProvider;
 import com.hubspot.dropwizard.guicier.objects.ProvidedServerLifecycleListener;
@@ -27,6 +28,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Injector;
 import com.hubspot.dropwizard.guicier.objects.ExplicitResource;
 import com.hubspot.dropwizard.guicier.objects.InjectedHealthCheck;
+import com.hubspot.dropwizard.guicier.objects.InjectedLifecycleListener;
 import com.hubspot.dropwizard.guicier.objects.InjectedManaged;
 import com.hubspot.dropwizard.guicier.objects.InjectedProvider;
 import com.hubspot.dropwizard.guicier.objects.InjectedServerLifecycleListener;
@@ -121,8 +123,19 @@ public class GuiceBundleTest {
         assertThat(environment.lifecycle())
             .extracting(Function.identity())
             .flatExtracting("lifecycleListeners")
+            .filteredOn(obj -> obj.getClass().getName().contains("ServerListener"))
             .extracting("listener")
             .containsOnlyOnce(injectedServerLifecycleListener);
+    }
+
+    @Test
+    public void itAddsBoundLifecycleLIstener() {
+        InjectedLifecycleListener injectedLifecycleListener =
+                guiceBundle.getInjector().getInstance(InjectedLifecycleListener.class);
+        assertThat(environment.lifecycle())
+                .extracting(Function.identity())
+                .flatExtracting("lifecycleListeners")
+                .containsOnlyOnce(injectedLifecycleListener);
     }
 
     @Test
@@ -167,8 +180,19 @@ public class GuiceBundleTest {
         assertThat(environment.lifecycle())
             .extracting(Function.identity())
             .flatExtracting("lifecycleListeners")
+            .filteredOn(obj -> obj.getClass().getName().contains("ServerListener"))
             .extracting("listener")
             .containsOnlyOnce(providedServerLifecycleListener);
+    }
+
+    @Test
+    public void itAddsProvidedLifecycleListener() {
+        ProvidedLifecycleListener providedLifecycleListener =
+                guiceBundle.getInjector().getInstance(ProvidedLifecycleListener.class);
+        assertThat(environment.lifecycle())
+                .extracting(Function.identity())
+                .flatExtracting("lifecycleListeners")
+                .containsOnlyOnce(providedLifecycleListener);
     }
 
     @Test
