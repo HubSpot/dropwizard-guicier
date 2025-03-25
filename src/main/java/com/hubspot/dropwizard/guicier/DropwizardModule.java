@@ -11,16 +11,16 @@ import io.dropwizard.lifecycle.Managed;
 import io.dropwizard.lifecycle.ServerLifecycleListener;
 import io.dropwizard.servlets.tasks.Task;
 import io.dropwizard.setup.Environment;
+import java.lang.reflect.Type;
+import javax.ws.rs.Path;
+import javax.ws.rs.ext.Provider;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.model.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.Path;
-import javax.ws.rs.ext.Provider;
-import java.lang.reflect.Type;
-
 public class DropwizardModule implements Module {
+
   private static final Logger LOG = LoggerFactory.getLogger(DropwizardModule.class);
 
   private final Environment environment;
@@ -31,28 +31,31 @@ public class DropwizardModule implements Module {
 
   @Override
   public void configure(final Binder binder) {
-    binder.bindListener(Matchers.any(), new ProvisionListener() {
-      @Override
-      public <T> void onProvision(ProvisionInvocation<T> provision) {
-        Object obj = provision.provision();
+    binder.bindListener(
+      Matchers.any(),
+      new ProvisionListener() {
+        @Override
+        public <T> void onProvision(ProvisionInvocation<T> provision) {
+          Object obj = provision.provision();
 
-        if (obj instanceof Managed) {
-          handle((Managed) obj);
-        }
+          if (obj instanceof Managed) {
+            handle((Managed) obj);
+          }
 
-        if (obj instanceof Task) {
-          handle((Task) obj);
-        }
+          if (obj instanceof Task) {
+            handle((Task) obj);
+          }
 
-        if (obj instanceof HealthCheck) {
-          handle((HealthCheck) obj);
-        }
+          if (obj instanceof HealthCheck) {
+            handle((HealthCheck) obj);
+          }
 
-        if (obj instanceof ServerLifecycleListener) {
-          handle((ServerLifecycleListener) obj);
+          if (obj instanceof ServerLifecycleListener) {
+            handle((ServerLifecycleListener) obj);
+          }
         }
       }
-    });
+    );
   }
 
   public void register(Injector injector) {
@@ -70,13 +73,18 @@ public class DropwizardModule implements Module {
   }
 
   private void handle(HealthCheck healthcheck) {
-    environment.healthChecks().register(healthcheck.getClass().getSimpleName(), healthcheck);
+    environment
+      .healthChecks()
+      .register(healthcheck.getClass().getSimpleName(), healthcheck);
     LOG.info("Added guice injected health check: {}", healthcheck.getClass().getName());
   }
 
   private void handle(ServerLifecycleListener serverLifecycleListener) {
     environment.lifecycle().addServerLifecycleListener(serverLifecycleListener);
-    LOG.info("Added guice injected server lifecycle listener: {}", serverLifecycleListener.getClass().getName());
+    LOG.info(
+      "Added guice injected server lifecycle listener: {}",
+      serverLifecycleListener.getClass().getName()
+    );
   }
 
   private void registerResourcesAndProviders(ResourceConfig config, Injector injector) {
@@ -91,14 +99,16 @@ public class DropwizardModule implements Module {
           } else if (isResourceClass(c)) {
             // Jersey rejects resources that it doesn't think are acceptable
             // Including abstract classes and interfaces, even if there is a valid Guice binding.
-            if(Resource.isAcceptable(c)) {
+            if (Resource.isAcceptable(c)) {
               LOG.info("Registering {} as a root resource class", c.getName());
               config.register(c);
             } else {
-              LOG.warn("Class {} was not registered as a resource; bind a concrete implementation instead", c.getName());
+              LOG.warn(
+                "Class {} was not registered as a resource; bind a concrete implementation instead",
+                c.getName()
+              );
             }
           }
-
         }
       }
       injector = injector.getParent();
