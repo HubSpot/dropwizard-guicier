@@ -4,4 +4,4 @@ server:
   adminContextPath: /admin
   connector:
     type: http
-    port: 9999
+    port: 0
