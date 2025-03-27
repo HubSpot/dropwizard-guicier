@@ -7,6 +7,7 @@ import com.google.inject.Key;
 import com.google.inject.Module;
 import com.google.inject.matcher.Matchers;
 import com.google.inject.spi.ProvisionListener;
+import com.hubspot.dropwizard.guicier.injection.InjectorProvider;
 import io.dropwizard.lifecycle.Managed;
 import io.dropwizard.lifecycle.ServerLifecycleListener;
 import io.dropwizard.servlets.tasks.Task;
@@ -60,6 +61,7 @@ public class DropwizardModule implements Module {
 
   public void register(Injector injector) {
     registerResourcesAndProviders(environment.jersey().getResourceConfig(), injector);
+    InjectorProvider.set(injector);
   }
 
   private void handle(Managed managed) {

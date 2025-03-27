@@ -1,4 +1,4 @@
-package com.hubspot.dropwizard.guicier.bridge;
+package com.hubspot.dropwizard.guicier.injection;
 
 import com.google.inject.BindingAnnotation;
 import com.google.inject.Key;
@@ -84,7 +84,7 @@ public class BindingUtils {
    */
   public static boolean isHk2Contract(Injectee injectee) {
     Type type = injectee.getRequiredType();
-    return isContact(type, org.jvnet.hk2.annotations.Contract.class);
+    return hasTypeAnnotation(type, org.jvnet.hk2.annotations.Contract.class);
   }
 
   /**
@@ -95,10 +95,10 @@ public class BindingUtils {
    */
   public static boolean isJerseyContract(Injectee injectee) {
     Type type = injectee.getRequiredType();
-    return isContact(type, org.glassfish.jersey.spi.Contract.class);
+    return hasTypeAnnotation(type, org.glassfish.jersey.spi.Contract.class);
   }
 
-  private static boolean isContact(
+  public static boolean hasTypeAnnotation(
     Type type,
     Class<? extends Annotation> annotationType
   ) {
@@ -108,7 +108,7 @@ public class BindingUtils {
 
     if (type instanceof ParameterizedType) {
       Type rawType = ((ParameterizedType) type).getRawType();
-      return isContact(rawType, annotationType);
+      return hasTypeAnnotation(rawType, annotationType);
     }
 
     return false;

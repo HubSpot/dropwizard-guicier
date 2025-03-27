@@ -2,8 +2,9 @@ package com.hubspot.dropwizard.guicier;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
+import com.google.inject.Scopes;
 import com.google.inject.servlet.RequestScoped;
-import com.hubspot.dropwizard.guicier.bridge.InjectionManagerProvider;
+import com.hubspot.dropwizard.guicier.injection.InjectionManagerProvider;
 import javax.servlet.ServletConfig;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ResourceContext;
@@ -24,7 +25,9 @@ public class JerseyGuicierModule extends AbstractModule {
 
   @Override
   protected void configure() {
-    bind(InjectionManager.class).toProvider(InjectionManagerProvider.class);
+    bind(InjectionManager.class)
+      .toProvider(InjectionManagerProvider.class)
+      .in(Scopes.NO_SCOPE);
   }
 
   @Provides

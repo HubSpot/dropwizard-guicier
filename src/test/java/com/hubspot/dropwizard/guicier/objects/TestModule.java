@@ -29,6 +29,8 @@ public class TestModule extends AbstractModule {
 
     bind(ExplicitResource.class);
     bind(JerseyContextResource.class);
+
+    bind(TestValueParamFeature.class);
   }
 
   @Provides

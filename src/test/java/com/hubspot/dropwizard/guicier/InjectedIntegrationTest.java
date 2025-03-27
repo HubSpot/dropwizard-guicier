@@ -9,6 +9,7 @@ import io.dropwizard.testing.ResourceHelpers;
 import io.dropwizard.testing.junit5.DropwizardAppExtension;
 import io.dropwizard.testing.junit5.DropwizardExtensionsSupport;
 import javax.ws.rs.client.Client;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,14 +41,22 @@ public class InjectedIntegrationTest {
 
   @Test
   public void hk2ContextBindingsAreResolvableInGuice() {
-    for (Class<?> clazz : HK2ContextBindings.SET) {
-      boolean resolvable = client
-        .target(getUri("/jersey-context/is-resolvable-by-guice"))
-        .queryParam("className", clazz.getName())
-        .request()
-        .get(Boolean.class);
-      assertThat(resolvable).as("%s is resolvable by Guice", clazz.getName()).isTrue();
-    }
+    Assertions.assertAll(
+      HK2ContextBindings.SET
+        .stream()
+        .map(clazz ->
+          () -> {
+            boolean resolvable = client
+              .target(getUri("/jersey-context/is-resolvable-by-guice"))
+              .queryParam("className", clazz.getName())
+              .request()
+              .get(Boolean.class);
+            assertThat(resolvable)
+              .as("%s is resolvable by Guice", clazz.getName())
+              .isTrue();
+          }
+        )
+    );
   }
 
   private static String getUri(String path) {

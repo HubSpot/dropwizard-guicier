@@ -1,4 +1,4 @@
-package com.hubspot.dropwizard.guicier.bridge;
+package com.hubspot.dropwizard.guicier.injection;
 
 import com.google.common.base.Preconditions;
 import java.util.concurrent.atomic.AtomicReference;
