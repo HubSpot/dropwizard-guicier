@@ -1,20 +1,17 @@
 package com.hubspot.dropwizard.guicier.injection;
 
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-
-import javax.inject.Singleton;
-
-import org.glassfish.hk2.api.ServiceLocator;
-import org.glassfish.hk2.utilities.reflection.ParameterizedTypeImpl;
-import org.glassfish.jersey.internal.inject.Injectee;
-import org.glassfish.jersey.internal.inject.InjectionResolver;
-
 import com.google.inject.ConfigurationException;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.Provider;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import javax.inject.Singleton;
+import org.glassfish.hk2.api.ServiceLocator;
+import org.glassfish.hk2.utilities.reflection.ParameterizedTypeImpl;
+import org.glassfish.jersey.internal.inject.Injectee;
+import org.glassfish.jersey.internal.inject.InjectionResolver;
 
 @Singleton
 public class GuiceInjectionResolver implements InjectionResolver<Inject> {
