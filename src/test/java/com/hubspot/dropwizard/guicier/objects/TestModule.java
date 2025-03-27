@@ -31,6 +31,11 @@ public class TestModule extends AbstractModule {
     bind(JerseyContextResource.class);
 
     bind(TestValueParamFeature.class);
+
+    bind(StashedValueFeature.class);
+    install(new StashesTestModule());
+
+    bind(EmptyCtorGoogleInjectResource.class);
   }
 
   @Provides

@@ -40,6 +40,14 @@ public class InjectedIntegrationTest {
   }
 
   @Test
+  public void emptyCtorGoogleInject() {
+    assertThat(
+      client.target(getUri("/empty-ctor-google-inject")).request().get(String.class)
+    )
+      .isEqualTo("world");
+  }
+
+  @Test
   public void hk2ContextBindingsAreResolvableInGuice() {
     Assertions.assertAll(
       HK2ContextBindings.SET

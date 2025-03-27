@@ -2,6 +2,7 @@ package com.hubspot.dropwizard.guicier.injection;
 
 import com.google.inject.BindingAnnotation;
 import com.google.inject.Key;
+import com.google.inject.Provider;
 import com.google.inject.internal.Nullability;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
@@ -15,10 +16,38 @@ import java.util.Optional;
 import java.util.Set;
 import javax.annotation.Nullable;
 import javax.inject.Qualifier;
+import org.glassfish.hk2.utilities.reflection.ParameterizedTypeImpl;
 import org.glassfish.hk2.utilities.reflection.ReflectionHelper;
 import org.glassfish.jersey.internal.inject.Injectee;
 
 public class BindingUtils {
+
+  public static Optional<Type> translateGuiceProviderType(Injectee injectee) {
+    Type requiredType = injectee.getRequiredType();
+    if (requiredType instanceof ParameterizedType) {
+      ParameterizedType parameterizedType = (ParameterizedType) requiredType;
+      if (parameterizedType.getRawType().equals(Provider.class)) {
+        return Optional.of(
+          new ParameterizedTypeImpl(
+            javax.inject.Provider.class,
+            parameterizedType.getActualTypeArguments()
+          )
+        );
+      }
+    }
+    return Optional.empty();
+  }
+
+  public static Provider<?> javaxToGuiceProvider(Object instance) {
+    if (!(instance instanceof javax.inject.Provider)) {
+      throw new IllegalArgumentException(
+        "Given instance is not of type javax.inject.Provider: " + instance
+      );
+    }
+
+    javax.inject.Provider<?> provider = (javax.inject.Provider<?>) instance;
+    return provider::get;
+  }
 
   /**
    * Returns {@code true} if the given {@link Injectee} can be {@code null}.

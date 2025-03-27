@@ -11,6 +11,7 @@ import com.google.inject.Stage;
 import com.google.inject.servlet.GuiceFilter;
 import com.google.inject.servlet.GuiceServletContextListener;
 import com.google.inject.servlet.ServletModule;
+import com.hubspot.dropwizard.guicier.injection.InjectionManagerProviderFeature;
 import io.dropwizard.Configuration;
 import io.dropwizard.ConfiguredBundle;
 import io.dropwizard.setup.Bootstrap;
@@ -90,6 +91,7 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
       .add(binder -> {
         binder.bind(Environment.class).toInstance(environment);
         binder.bind(configClass).toInstance(configuration);
+        binder.bind(InjectionManagerProviderFeature.class);
       });
     if (enableGuiceEnforcer) {
       modulesBuilder.add(new GuiceEnforcerModule());
@@ -97,7 +99,6 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
     this.injector = injectorFactory.create(guiceStage, modulesBuilder.build());
 
     dropwizardModule.register(injector);
-
     environment
       .servlets()
       .addFilter("Guice Filter", GuiceFilter.class)

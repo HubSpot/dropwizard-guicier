@@ -4,12 +4,10 @@ import com.google.inject.ConfigurationException;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Key;
-import com.google.inject.Provider;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Optional;
 import javax.inject.Singleton;
 import org.glassfish.hk2.api.ServiceLocator;
-import org.glassfish.hk2.utilities.reflection.ParameterizedTypeImpl;
 import org.glassfish.jersey.internal.inject.Injectee;
 import org.glassfish.jersey.internal.inject.InjectionResolver;
 
@@ -36,23 +34,16 @@ public class GuiceInjectionResolver implements InjectionResolver<Inject> {
     }
 
     if (instance == null) {
-      Type t = injectee.getRequiredType();
-      boolean wrapProvider = false;
-      if (t instanceof ParameterizedType) {
-        ParameterizedType pt = (ParameterizedType) t;
-        if (pt.getRawType().equals(Provider.class)) {
-          t =
-            new ParameterizedTypeImpl(
-              javax.inject.Provider.class,
-              pt.getActualTypeArguments()
-            );
-          wrapProvider = true;
-        }
-      }
-      instance = serviceLocator.getService(t);
-      if (instance != null && wrapProvider) {
-        javax.inject.Provider jaxProvider = (javax.inject.Provider) instance;
-        return (Provider) jaxProvider::get;
+      Optional<Type> translatedGuiceProviderType =
+        BindingUtils.translateGuiceProviderType(injectee);
+
+      instance =
+        serviceLocator.getService(
+          translatedGuiceProviderType.orElse(injectee.getRequiredType())
+        );
+
+      if (instance != null && translatedGuiceProviderType.isPresent()) {
+        return BindingUtils.javaxToGuiceProvider(instance);
       }
     }
 
