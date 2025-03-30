@@ -60,8 +60,8 @@ public class DropwizardModule implements Module {
   }
 
   public void register(Injector injector) {
-    registerResourcesAndProviders(environment.jersey().getResourceConfig(), injector);
     InjectorProvider.set(injector);
+    registerResourcesAndProviders(environment.jersey().getResourceConfig(), injector);
   }
 
   private void handle(Managed managed) {
