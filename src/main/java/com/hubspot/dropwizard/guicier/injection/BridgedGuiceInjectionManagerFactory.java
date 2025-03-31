@@ -1,11 +1,10 @@
 package com.hubspot.dropwizard.guicier.injection;
 
+import com.google.inject.Injector;
 import java.util.Optional;
-
 import javax.annotation.Priority;
 import javax.ws.rs.ConstrainedTo;
 import javax.ws.rs.RuntimeType;
-
 import org.glassfish.jersey.inject.hk2.Hk2InjectionManagerFactory;
 import org.glassfish.jersey.inject.hk2.ImmediateHk2InjectionManager;
 import org.glassfish.jersey.internal.inject.Bindings;
@@ -15,8 +14,6 @@ import org.jvnet.hk2.guice.bridge.api.GuiceBridge;
 import org.jvnet.hk2.guice.bridge.api.GuiceIntoHK2Bridge;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.inject.Injector;
 
 @Priority(15)
 @ConstrainedTo(RuntimeType.SERVER)
