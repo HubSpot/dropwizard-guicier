@@ -36,6 +36,9 @@ public class TestModule extends AbstractModule {
     install(new StashesTestModule());
 
     bind(EmptyCtorGoogleInjectResource.class);
+
+    bind(ComponentInvocationCounter.class);
+    bind(ContextInjectedFilter.class);
   }
 
   @Provides

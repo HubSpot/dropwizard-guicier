@@ -55,6 +55,10 @@ public class BridgedGuiceInjectionManager extends DelegatingInjectionManager {
       return null;
     }
 
-    return (T) guiceInjector.getInstance(key);
+    T instance = (T) guiceInjector.getInstance(key);
+    if (instance != null) {
+      super.inject(instance);
+    }
+    return instance;
   }
 }
