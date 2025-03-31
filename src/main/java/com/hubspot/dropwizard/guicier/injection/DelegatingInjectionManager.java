@@ -17,6 +17,10 @@ public class DelegatingInjectionManager implements InjectionManager {
     this.delegate = delegate;
   }
 
+  public InjectionManager getDelegate() {
+    return delegate;
+  }
+
   @Override
   public void completeRegistration() {
     delegate.completeRegistration();
