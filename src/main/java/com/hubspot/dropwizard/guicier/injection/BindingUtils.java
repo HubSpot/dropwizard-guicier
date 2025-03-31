@@ -1,5 +1,9 @@
 package com.hubspot.dropwizard.guicier.injection;
 
+import com.google.inject.BindingAnnotation;
+import com.google.inject.Key;
+import com.google.inject.Provider;
+import com.google.inject.internal.Nullability;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Constructor;
@@ -10,18 +14,11 @@ import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
-
 import javax.annotation.Nullable;
 import javax.inject.Qualifier;
-
 import org.glassfish.hk2.utilities.reflection.ParameterizedTypeImpl;
 import org.glassfish.hk2.utilities.reflection.ReflectionHelper;
 import org.glassfish.jersey.internal.inject.Injectee;
-
-import com.google.inject.BindingAnnotation;
-import com.google.inject.Key;
-import com.google.inject.Provider;
-import com.google.inject.internal.Nullability;
 
 public class BindingUtils {
 

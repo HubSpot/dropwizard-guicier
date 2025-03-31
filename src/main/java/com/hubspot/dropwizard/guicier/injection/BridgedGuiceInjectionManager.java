@@ -2,14 +2,12 @@ package com.hubspot.dropwizard.guicier.injection;
 
 import static com.hubspot.dropwizard.guicier.injection.BindingUtils.newKey;
 
+import com.google.inject.Injector;
+import com.google.inject.Key;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.Set;
-
 import org.glassfish.jersey.internal.inject.InjectionManager;
-
-import com.google.inject.Injector;
-import com.google.inject.Key;
 
 /**
  * InjectionManager which gets instances from Guice bindings first, falling back to delegate
