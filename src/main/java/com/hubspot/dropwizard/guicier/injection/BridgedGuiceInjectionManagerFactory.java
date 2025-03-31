@@ -52,6 +52,6 @@ public class BridgedGuiceInjectionManagerFactory implements InjectionManagerFact
     injectionManager.register(Bindings.service(guiceInjector).to(Injector.class));
 
     LOG.debug("Guice Component Provider initialized");
-    return injectionManager;
+    return new BridgedGuiceInjectionManager(injectionManager, guiceInjector);
   }
 }

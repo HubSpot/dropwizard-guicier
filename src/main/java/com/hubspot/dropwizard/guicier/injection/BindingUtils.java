@@ -1,9 +1,5 @@
 package com.hubspot.dropwizard.guicier.injection;
 
-import com.google.inject.BindingAnnotation;
-import com.google.inject.Key;
-import com.google.inject.Provider;
-import com.google.inject.internal.Nullability;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Constructor;
@@ -14,11 +10,18 @@ import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
+
 import javax.annotation.Nullable;
 import javax.inject.Qualifier;
+
 import org.glassfish.hk2.utilities.reflection.ParameterizedTypeImpl;
 import org.glassfish.hk2.utilities.reflection.ReflectionHelper;
 import org.glassfish.jersey.internal.inject.Injectee;
+
+import com.google.inject.BindingAnnotation;
+import com.google.inject.Key;
+import com.google.inject.Provider;
+import com.google.inject.internal.Nullability;
 
 public class BindingUtils {
 
@@ -155,7 +158,7 @@ public class BindingUtils {
   /**
    * Creates and returns a {@link Key} for the given {@link Type} and {@link Set} of {@link Annotation}s.
    */
-  private static Key<?> newKey(Type type, Set<? extends Annotation> qualifiers) {
+  public static Key<?> newKey(Type type, Set<? extends Annotation> qualifiers) {
     if (qualifiers.isEmpty()) {
       return Key.get(type);
     }
