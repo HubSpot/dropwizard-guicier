@@ -1,6 +1,7 @@
 package com.hubspot.dropwizard.guicier.injection;
 
 import com.google.inject.Injector;
+import java.util.Optional;
 import javax.annotation.Priority;
 import javax.ws.rs.ConstrainedTo;
 import javax.ws.rs.RuntimeType;
@@ -27,13 +28,14 @@ public class BridgedGuiceInjectionManagerFactory implements InjectionManagerFact
     ImmediateHk2InjectionManager injectionManager =
       (ImmediateHk2InjectionManager) new Hk2InjectionManagerFactory().create(parent);
 
-    Injector guiceInjector = new InjectorProvider().get();
+    Optional<Injector> guiceInjectorMaybe = InjectorProvider.getMaybe();
 
-    if (guiceInjector == null) {
-      throw new IllegalStateException(
-        "Failed to lookup guice injector from servlet context"
-      );
+    if (guiceInjectorMaybe.isEmpty()) {
+      LOG.warn("No guice injector is set");
+      return injectionManager;
     }
+
+    Injector guiceInjector = guiceInjectorMaybe.get();
 
     // initialize HK2 guice-bridge
     GuiceBridge
