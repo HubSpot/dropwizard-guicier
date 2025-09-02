@@ -3,10 +3,10 @@ package com.hubspot.dropwizard.guicier.aop;
 import com.google.inject.AbstractModule;
 import com.google.inject.matcher.Matchers;
 import com.hubspot.dropwizard.guicier.GuiceBundle;
-import io.dropwizard.Application;
-import io.dropwizard.Configuration;
-import io.dropwizard.setup.Bootstrap;
-import io.dropwizard.setup.Environment;
+import io.dropwizard.core.Application;
+import io.dropwizard.core.Configuration;
+import io.dropwizard.core.setup.Bootstrap;
+import io.dropwizard.core.setup.Environment;
 
 public class AopTestApplication extends Application<Configuration> {
 

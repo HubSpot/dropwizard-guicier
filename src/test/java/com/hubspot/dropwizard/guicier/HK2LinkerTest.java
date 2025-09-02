@@ -8,7 +8,7 @@ import com.google.inject.Key;
 import com.hubspot.dropwizard.guicier.objects.ExplicitResource;
 import com.hubspot.dropwizard.guicier.objects.HK2ContextBindings;
 import com.hubspot.dropwizard.guicier.objects.TestApplication;
-import io.dropwizard.Configuration;
+import io.dropwizard.core.Configuration;
 import io.dropwizard.testing.ResourceHelpers;
 import io.dropwizard.testing.junit5.DropwizardAppExtension;
 import io.dropwizard.testing.junit5.DropwizardExtensionsSupport;

@@ -5,22 +5,24 @@
   <parent>
     <groupId>com.hubspot</groupId>
     <artifactId>basepom</artifactId>
-    <version>63.2</version>
+    <version>63.6</version>
   </parent>
 
   <groupId>com.hubspot.dropwizard</groupId>
   <artifactId>dropwizard-guicier</artifactId>
-  <version>2.1.0-SNAPSHOT</version>
+  <version>3.0.0-SNAPSHOT</version>
 
   <properties>
     <dep.assertj.version>3.9.1</dep.assertj.version>
-    <dep.dropwizard.version>2.1.12</dep.dropwizard.version>
-    <dep.dropwizard-metrics.version>4.2.25</dep.dropwizard-metrics.version>
+    <dep.dropwizard.version>3.0.16</dep.dropwizard.version>
+    <dep.dropwizard-metrics.version>4.2.36</dep.dropwizard-metrics.version>
+    <dep.guava.version>33.4.8-jre</dep.guava.version>
     <dep.hk2.version>2.6.1</dep.hk2.version>
-    <dep.jackson.version>2.16.2</dep.jackson.version>
+    <dep.jackson.version>2.19.2</dep.jackson.version>
     <dep.jackson-databind.version>${dep.jackson.version}</dep.jackson-databind.version>
-    <dep.jersey2.version>2.41</dep.jersey2.version>
-    <dep.jetty.version>9.4.53.v20231009</dep.jetty.version>
+    <dep.jersey2.version>2.47</dep.jersey2.version>
+    <dep.jetty.version>10.0.26</dep.jetty.version>
+    <dep.slf4j.version>2.0.17</dep.slf4j.version>
 
     <project.build.targetJdk>11</project.build.targetJdk>
   </properties>
@@ -36,6 +38,17 @@
         <groupId>org.glassfish.jersey.inject</groupId>
         <artifactId>jersey-hk2</artifactId>
         <version>${dep.jersey2.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-server</artifactId>
+        <version>${dep.jetty.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.eclipse.jetty.toolchain</groupId>
+            <artifactId>jetty-servlet-api</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -150,4 +163,34 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.basepom.maven</groupId>
+          <artifactId>duplicate-finder-maven-plugin</artifactId>
+          <configuration>
+            <exceptions combine.children="append">
+              <exception>
+                <conflictingDependencies>
+                  <dependency>
+                    <groupId>org.jspecify</groupId>
+                    <artifactId>jspecify</artifactId>
+                  </dependency>
+                  <dependency>
+                    <groupId>io.dropwizard.logback</groupId>
+                    <artifactId>logback-throttling-appender</artifactId>
+                  </dependency>
+                </conflictingDependencies>
+                <classes>
+                  <class>org.jspecify.annotations.Nullable</class>
+                </classes>
+              </exception>
+            </exceptions>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
 </project>

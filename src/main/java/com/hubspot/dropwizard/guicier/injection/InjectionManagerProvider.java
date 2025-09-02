@@ -2,7 +2,7 @@ package com.hubspot.dropwizard.guicier.injection;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import io.dropwizard.setup.Environment;
+import io.dropwizard.core.setup.Environment;
 import java.util.HashMap;
 import java.util.Map;
 import javax.inject.Inject;

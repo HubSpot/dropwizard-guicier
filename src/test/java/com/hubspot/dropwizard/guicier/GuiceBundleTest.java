@@ -17,8 +17,8 @@ import com.hubspot.dropwizard.guicier.objects.ProvidedServerLifecycleListener;
 import com.hubspot.dropwizard.guicier.objects.ProvidedTask;
 import com.hubspot.dropwizard.guicier.objects.ProviderManaged;
 import com.hubspot.dropwizard.guicier.objects.TestApplication;
-import io.dropwizard.Configuration;
-import io.dropwizard.setup.Environment;
+import io.dropwizard.core.Configuration;
+import io.dropwizard.core.setup.Environment;
 import io.dropwizard.testing.ResourceHelpers;
 import io.dropwizard.testing.junit5.DropwizardAppExtension;
 import io.dropwizard.testing.junit5.DropwizardExtensionsSupport;
@@ -33,10 +33,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 @ExtendWith(DropwizardExtensionsSupport.class)
 public class GuiceBundleTest {
 
-  private static DropwizardAppExtension<Configuration> EXT = new DropwizardAppExtension<>(
-    TestApplication.class,
-    ResourceHelpers.resourceFilePath("test-config.yml")
-  );
+  private static final DropwizardAppExtension<Configuration> EXT =
+    new DropwizardAppExtension<>(
+      TestApplication.class,
+      ResourceHelpers.resourceFilePath("test-config.yml")
+    );
 
   private Environment environment;
   private GuiceBundle<Configuration> guiceBundle;
