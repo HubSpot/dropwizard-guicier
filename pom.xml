@@ -12,6 +12,8 @@
   <artifactId>dropwizard-guicier</artifactId>
   <version>1.3.5.3-SNAPSHOT</version>
 
+  <name>${project.groupId}:${project.artifactId}</name>
+
   <properties>
     <basepom.check.skip-dependency-versions-check>true</basepom.check.skip-dependency-versions-check>
   </properties>
@@ -155,6 +157,15 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+
+  <url>https://github.com/HubSpot/dropwizard-guicier</url>
+
+  <licenses>
+    <license>
+      <name>The Apache License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
 
   <developers>
     <developer>
