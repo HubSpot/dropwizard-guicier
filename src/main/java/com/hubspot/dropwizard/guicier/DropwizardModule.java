@@ -61,22 +61,22 @@ public class DropwizardModule implements Module {
 
   private void handle(Managed managed) {
     environment.lifecycle().manage(managed);
-    LOG.info("Added guice injected managed Object: {}", managed.getClass().getName());
+    LOG.debug("Added guice injected managed Object: {}", managed.getClass().getName());
   }
 
   private void handle(Task task) {
     environment.admin().addTask(task);
-    LOG.info("Added guice injected Task: {}", task.getClass().getName());
+    LOG.debug("Added guice injected Task: {}", task.getClass().getName());
   }
 
   private void handle(HealthCheck healthcheck) {
     environment.healthChecks().register(healthcheck.getClass().getSimpleName(), healthcheck);
-    LOG.info("Added guice injected health check: {}", healthcheck.getClass().getName());
+    LOG.debug("Added guice injected health check: {}", healthcheck.getClass().getName());
   }
 
   private void handle(ServerLifecycleListener serverLifecycleListener) {
     environment.lifecycle().addServerLifecycleListener(serverLifecycleListener);
-    LOG.info("Added guice injected server lifecycle listener: {}", serverLifecycleListener.getClass().getName());
+    LOG.debug("Added guice injected server lifecycle listener: {}", serverLifecycleListener.getClass().getName());
   }
 
   private void registerResourcesAndProviders(ResourceConfig config, Injector injector) {
@@ -86,13 +86,13 @@ public class DropwizardModule implements Module {
         if (type instanceof Class<?>) {
           Class<?> c = (Class<?>) type;
           if (isProviderClass(c)) {
-            LOG.info("Registering {} as a provider class", c.getName());
+            LOG.debug("Registering {} as a provider class", c.getName());
             config.register(c);
           } else if (isResourceClass(c)) {
             // Jersey rejects resources that it doesn't think are acceptable
             // Including abstract classes and interfaces, even if there is a valid Guice binding.
             if(Resource.isAcceptable(c)) {
-              LOG.info("Registering {} as a root resource class", c.getName());
+              LOG.debug("Registering {} as a root resource class", c.getName());
               config.register(c);
             } else {
               LOG.warn("Class {} was not registered as a resource; bind a concrete implementation instead", c.getName());
