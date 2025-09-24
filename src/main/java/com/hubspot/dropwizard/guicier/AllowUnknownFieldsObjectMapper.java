@@ -2,7 +2,6 @@ package com.hubspot.dropwizard.guicier;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import io.dropwizard.setup.Bootstrap;
 
 /**
@@ -17,7 +16,9 @@ public class AllowUnknownFieldsObjectMapper extends ObjectMapper {
   }
 
   public static void applyTo(Bootstrap<?> bootstrap) {
-    bootstrap.setObjectMapper(new AllowUnknownFieldsObjectMapper(bootstrap.getObjectMapper()));
+    bootstrap.setObjectMapper(
+      new AllowUnknownFieldsObjectMapper(bootstrap.getObjectMapper())
+    );
   }
 
   @Override
