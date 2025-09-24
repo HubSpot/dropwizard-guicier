@@ -1,7 +1,7 @@
 package com.hubspot.dropwizard.guicier.objects;
 
+import com.google.common.collect.ImmutableSet;
 import java.util.Set;
-
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -14,12 +14,10 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.Providers;
-
 import org.glassfish.jersey.server.ExtendedUriInfo;
 
-import com.google.common.collect.ImmutableSet;
-
 public class HK2ContextBindings {
+
   // This list comes from https://stackoverflow.com/a/35868654
   public static final Set<Class<?>> SET = ImmutableSet.of(
     Application.class,
@@ -36,7 +34,8 @@ public class HK2ContextBindings {
     ServletContext.class,
     UriInfo.class,
     // Jersey-specific
-    ExtendedUriInfo.class);
+    ExtendedUriInfo.class
+  );
 
   private HK2ContextBindings() {
     throw new AssertionError();

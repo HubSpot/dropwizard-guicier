@@ -5,11 +5,11 @@ import com.google.inject.Inject;
 
 public class InjectedHealthCheck extends HealthCheck {
 
-    @Inject
-    InjectedHealthCheck() {}
+  @Inject
+  InjectedHealthCheck() {}
 
-    @Override
-    protected Result check() throws Exception {
-        return Result.healthy();
-    }
+  @Override
+  protected Result check() throws Exception {
+    return Result.healthy();
+  }
 }
