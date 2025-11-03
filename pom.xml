@@ -13,7 +13,6 @@
   <version>3.0.0-SNAPSHOT</version>
 
   <properties>
-    <dep.assertj.version>3.9.1</dep.assertj.version>
     <dep.dropwizard.version>3.0.16</dep.dropwizard.version>
     <dep.dropwizard-metrics.version>4.2.36</dep.dropwizard-metrics.version>
     <dep.guava.version>33.4.8-jre</dep.guava.version>
