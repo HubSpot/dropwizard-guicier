@@ -2,11 +2,7 @@ package com.hubspot.dropwizard.guicier;
 
 import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
-import com.codahale.metrics.MetricRegistry;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Injector;
 import com.hubspot.dropwizard.guicier.objects.ExplicitResource;
 import com.hubspot.dropwizard.guicier.objects.InjectedHealthCheck;
@@ -21,44 +17,37 @@ import com.hubspot.dropwizard.guicier.objects.ProvidedProvider;
 import com.hubspot.dropwizard.guicier.objects.ProvidedServerLifecycleListener;
 import com.hubspot.dropwizard.guicier.objects.ProvidedTask;
 import com.hubspot.dropwizard.guicier.objects.ProviderManaged;
-import com.hubspot.dropwizard.guicier.objects.TestModule;
-import com.squarespace.jersey2.guice.JerseyGuiceUtils;
-import io.dropwizard.Configuration;
-import io.dropwizard.jackson.Jackson;
-import io.dropwizard.setup.Bootstrap;
-import io.dropwizard.setup.Environment;
+import com.hubspot.dropwizard.guicier.objects.TestApplication;
+import io.dropwizard.core.Configuration;
+import io.dropwizard.core.setup.Environment;
+import io.dropwizard.testing.ResourceHelpers;
+import io.dropwizard.testing.junit5.DropwizardAppExtension;
+import io.dropwizard.testing.junit5.DropwizardExtensionsSupport;
 import java.util.Set;
 import javax.servlet.ServletException;
 import org.assertj.core.api.InstanceOfAssertFactories;
-import org.glassfish.hk2.api.ServiceLocator;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.glassfish.jersey.internal.inject.InjectionManager;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(DropwizardExtensionsSupport.class)
 public class GuiceBundleTest {
+
+  private static final DropwizardAppExtension<Configuration> EXT =
+    new DropwizardAppExtension<>(
+      TestApplication.class,
+      ResourceHelpers.resourceFilePath("test-config.yml")
+    );
 
   private Environment environment;
   private GuiceBundle<Configuration> guiceBundle;
 
-  @After
-  public void tearDown() {
-    JerseyGuiceUtils.reset();
-  }
-
-  @Before
-  public void setUp() throws Exception {
-    ObjectMapper objectMapper = Jackson.newObjectMapper();
-    environment =
-      new Environment("test env", objectMapper, null, new MetricRegistry(), null);
-    guiceBundle =
-      GuiceBundle.defaultBuilder(Configuration.class).modules(new TestModule()).build();
-    Bootstrap bootstrap = mock(Bootstrap.class);
-    when(bootstrap.getObjectMapper()).thenReturn(objectMapper);
-    guiceBundle.initialize(bootstrap);
-    guiceBundle.run(new Configuration(), environment);
+  @BeforeEach
+  public void setup() {
+    TestApplication testApplication = EXT.getApplication();
+    this.guiceBundle = testApplication.getGuiceBundle();
+    this.environment = EXT.getEnvironment();
   }
 
   @Test
@@ -68,11 +57,11 @@ public class GuiceBundleTest {
   }
 
   @Test
-  public void serviceLocatorIsAvaliable() throws ServletException {
-    ServiceLocator serviceLocator = guiceBundle
+  public void serviceLocatorIsAvailable() throws ServletException {
+    InjectionManager injectionManager = guiceBundle
       .getInjector()
-      .getInstance(ServiceLocator.class);
-    assertThat(serviceLocator).isNotNull();
+      .getInstance(InjectionManager.class);
+    assertThat(injectionManager).isNotNull();
   }
 
   @Test

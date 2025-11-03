@@ -1,8 +1,9 @@
 package com.hubspot.dropwizard.guicier.objects;
 
-import com.google.common.collect.ImmutableMultimap;
 import io.dropwizard.servlets.tasks.Task;
 import java.io.PrintWriter;
+import java.util.List;
+import java.util.Map;
 
 public class ProvidedTask extends Task {
 
@@ -11,8 +12,6 @@ public class ProvidedTask extends Task {
   }
 
   @Override
-  public void execute(
-    ImmutableMultimap<String, String> immutableMultimap,
-    PrintWriter printWriter
-  ) {}
+  public void execute(Map<String, List<String>> parameters, PrintWriter output)
+    throws Exception {}
 }

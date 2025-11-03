@@ -29,6 +29,16 @@ public class TestModule extends AbstractModule {
 
     bind(ExplicitResource.class);
     bind(JerseyContextResource.class);
+
+    bind(TestValueParamFeature.class);
+
+    bind(StashedValueFeature.class);
+    install(new StashesTestModule());
+
+    bind(EmptyCtorGoogleInjectResource.class);
+
+    bind(ComponentInvocationCounter.class);
+    bind(ContextInjectedFilter.class);
   }
 
   @Provides
