@@ -5,3 +5,8 @@ server:
   connector:
     type: http
     port: 0
+
+# default logging relies on logback JMXConfigurator
+# which no longer exists
+logging:
+  type: external

@@ -4,8 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.hubspot.dropwizard.guicier.objects.ExplicitDAO;
 import com.hubspot.dropwizard.guicier.objects.ExplicitResource;
+import com.squarespace.jersey2.guice.JerseyGuiceUtils;
 import io.dropwizard.testing.junit5.DropwizardExtensionsSupport;
 import io.dropwizard.testing.junit5.ResourceExtension;
+import org.junit.ClassRule;
+import org.junit.Test;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 

@@ -1,5 +1,6 @@
 package com.hubspot.dropwizard.guicier;
 
+import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.inject.Injector;
@@ -10,11 +11,18 @@ import com.hubspot.dropwizard.guicier.objects.InjectedProvider;
 import com.hubspot.dropwizard.guicier.objects.InjectedServerLifecycleListener;
 import com.hubspot.dropwizard.guicier.objects.InjectedTask;
 import com.hubspot.dropwizard.guicier.objects.InstanceManaged;
+import com.hubspot.dropwizard.guicier.objects.InstanceManaged;
+import com.hubspot.dropwizard.guicier.objects.ProvidedHealthCheck;
 import com.hubspot.dropwizard.guicier.objects.ProvidedHealthCheck;
 import com.hubspot.dropwizard.guicier.objects.ProvidedManaged;
+import com.hubspot.dropwizard.guicier.objects.ProvidedManaged;
+import com.hubspot.dropwizard.guicier.objects.ProvidedProvider;
 import com.hubspot.dropwizard.guicier.objects.ProvidedProvider;
 import com.hubspot.dropwizard.guicier.objects.ProvidedServerLifecycleListener;
+import com.hubspot.dropwizard.guicier.objects.ProvidedServerLifecycleListener;
 import com.hubspot.dropwizard.guicier.objects.ProvidedTask;
+import com.hubspot.dropwizard.guicier.objects.ProvidedTask;
+import com.hubspot.dropwizard.guicier.objects.ProviderManaged;
 import com.hubspot.dropwizard.guicier.objects.ProviderManaged;
 import com.hubspot.dropwizard.guicier.objects.TestApplication;
 import io.dropwizard.core.Configuration;
@@ -23,12 +31,21 @@ import io.dropwizard.testing.ResourceHelpers;
 import io.dropwizard.testing.junit5.DropwizardAppExtension;
 import io.dropwizard.testing.junit5.DropwizardExtensionsSupport;
 import java.util.Set;
+import java.util.Set;
 import java.util.function.Function;
 import javax.servlet.ServletException;
+import javax.servlet.ServletException;
+import org.assertj.core.api.InstanceOfAssertFactories;
+import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.jersey.internal.inject.InjectionManager;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @ExtendWith(DropwizardExtensionsSupport.class)
 public class GuiceBundleTest {
@@ -98,7 +115,7 @@ public class GuiceBundleTest {
     InjectedTask injectedTask = guiceBundle.getInjector().getInstance(InjectedTask.class);
     assertThat(environment.admin())
       .extracting("tasks")
-      .flatExtracting("tasks")
+      .extracting("tasks", as(InstanceOfAssertFactories.ITERABLE))
       .containsOnlyOnce(injectedTask);
   }
 
@@ -114,8 +131,7 @@ public class GuiceBundleTest {
       .getInjector()
       .getInstance(InjectedServerLifecycleListener.class);
     assertThat(environment.lifecycle())
-      .extracting(Function.identity())
-      .flatExtracting("lifecycleListeners")
+      .extracting("lifecycleListeners", as(InstanceOfAssertFactories.ITERABLE))
       .extracting("listener")
       .containsOnlyOnce(injectedServerLifecycleListener);
   }
@@ -147,7 +163,7 @@ public class GuiceBundleTest {
     ProvidedTask providedTask = guiceBundle.getInjector().getInstance(ProvidedTask.class);
     assertThat(environment.admin())
       .extracting("tasks")
-      .flatExtracting("tasks")
+      .extracting("tasks", as(InstanceOfAssertFactories.ITERABLE))
       .containsOnlyOnce(providedTask);
   }
 
@@ -163,8 +179,7 @@ public class GuiceBundleTest {
       .getInjector()
       .getInstance(ProvidedServerLifecycleListener.class);
     assertThat(environment.lifecycle())
-      .extracting(Function.identity())
-      .flatExtracting("lifecycleListeners")
+      .extracting("lifecycleListeners", as(InstanceOfAssertFactories.ITERABLE))
       .extracting("listener")
       .containsOnlyOnce(providedServerLifecycleListener);
   }

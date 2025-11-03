@@ -5,7 +5,7 @@
   <parent>
     <groupId>com.hubspot</groupId>
     <artifactId>basepom</artifactId>
-    <version>63.6</version>
+    <version>63.7</version>
   </parent>
 
   <groupId>com.hubspot.dropwizard</groupId>
@@ -69,6 +69,10 @@
     <dependency>
       <groupId>com.google.inject</groupId>
       <artifactId>guice</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>javax.validation</groupId>
+      <artifactId>validation-api</artifactId>
     </dependency>
     <dependency>
       <groupId>com.google.inject.extensions</groupId>
@@ -193,4 +197,29 @@
       </plugins>
     </pluginManagement>
   </build>
+
+  <url>https://github.com/HubSpot/dropwizard-guicier</url>
+
+  <licenses>
+    <license>
+      <name>The Apache License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <id>hgschmie</id>
+      <name>Henning Schmiedehausen</name>
+      <email>henning@schmiedehausen.org</email>
+      <timezone>-8</timezone>
+    </developer>
+  </developers>
+
+  <scm>
+    <connection>scm:git:git@github.com:HubSpot/dropwizard-guicier.git</connection>
+    <developerConnection>scm:git:git@github.com:HubSpot/dropwizard-guicier.git</developerConnection>
+    <url>git@github.com:HubSpot/dropwizard-guicier.git</url>
+    <tag>HEAD</tag>
+  </scm>
 </project>
