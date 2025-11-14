@@ -5,7 +5,7 @@ import com.google.inject.Provides;
 import com.google.inject.Scopes;
 import com.google.inject.name.Named;
 import com.google.inject.name.Names;
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 
 public class TestModule extends AbstractModule {
 
@@ -29,6 +29,16 @@ public class TestModule extends AbstractModule {
 
     bind(ExplicitResource.class);
     bind(JerseyContextResource.class);
+
+    bind(TestValueParamFeature.class);
+
+    bind(StashedValueFeature.class);
+    install(new StashesTestModule());
+
+    bind(EmptyCtorGoogleInjectResource.class);
+
+    bind(ComponentInvocationCounter.class);
+    bind(ContextInjectedFilter.class);
   }
 
   @Provides

@@ -11,16 +11,12 @@ import com.google.inject.Stage;
 import com.google.inject.servlet.GuiceFilter;
 import com.google.inject.servlet.GuiceServletContextListener;
 import com.google.inject.servlet.ServletModule;
-import com.squarespace.jersey2.guice.JerseyGuiceModule;
-import com.squarespace.jersey2.guice.JerseyGuiceUtils;
-import io.dropwizard.Configuration;
-import io.dropwizard.ConfiguredBundle;
-import io.dropwizard.setup.Bootstrap;
-import io.dropwizard.setup.Environment;
-import java.lang.reflect.Field;
+import com.hubspot.dropwizard.guicier.injection.InjectionManagerProviderFeature;
+import io.dropwizard.core.Configuration;
+import io.dropwizard.core.ConfiguredBundle;
+import io.dropwizard.core.setup.Bootstrap;
+import io.dropwizard.core.setup.Environment;
 import java.util.Arrays;
-import org.glassfish.hk2.api.ServiceLocator;
-import org.glassfish.hk2.internal.ServiceLocatorFactoryImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,38 +80,25 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
     }
 
     final DropwizardModule dropwizardModule = new DropwizardModule(environment);
-    // We assume that the next service locator will be the main application one
-    final String serviceLocatorName = getNextServiceLocatorName();
+
     ImmutableSet.Builder<Module> modulesBuilder = ImmutableSet
       .<Module>builder()
       .addAll(guiceModules)
       .addAll(dropwizardAwareModules)
       .add(new ServletModule())
       .add(dropwizardModule)
-      .add(new JerseyGuiceModule(serviceLocatorName))
       .add(new JerseyGuicierModule())
       .add(binder -> {
         binder.bind(Environment.class).toInstance(environment);
         binder.bind(configClass).toInstance(configuration);
+        binder.bind(InjectionManagerProviderFeature.class);
       });
     if (enableGuiceEnforcer) {
       modulesBuilder.add(new GuiceEnforcerModule());
     }
     this.injector = injectorFactory.create(guiceStage, modulesBuilder.build());
 
-    JerseyGuiceUtils.install((name, parent) -> {
-      if (!name.startsWith("__HK2_")) {
-        return null;
-      } else if (serviceLocatorName.equals(name)) {
-        return injector.getInstance(ServiceLocator.class);
-      } else {
-        LOG.debug("Returning a new ServiceLocator for name '{}'", name);
-        return JerseyGuiceUtils.newServiceLocator(name, parent);
-      }
-    });
-
     dropwizardModule.register(injector);
-
     environment
       .servlets()
       .addFilter("Guice Filter", GuiceFilter.class)
@@ -209,23 +192,6 @@ public class GuiceBundle<T extends Configuration> implements ConfiguredBundle<T>
         enableGuiceEnforcer,
         injectorFactory
       );
-    }
-  }
-
-  private static String getNextServiceLocatorName() {
-    Class<ServiceLocatorFactoryImpl> factoryClass = ServiceLocatorFactoryImpl.class;
-    try {
-      Field nameCountField = factoryClass.getDeclaredField("name_count");
-      nameCountField.setAccessible(true);
-      int count = (int) nameCountField.get(null);
-
-      Field namePrefixField = factoryClass.getDeclaredField("GENERATED_NAME_PREFIX");
-      namePrefixField.setAccessible(true);
-      String prefix = (String) namePrefixField.get(null);
-
-      return prefix + count;
-    } catch (NoSuchFieldException | IllegalAccessException e) {
-      throw new RuntimeException(e);
     }
   }
 }
