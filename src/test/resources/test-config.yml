@@ -4,7 +4,7 @@ server:
   adminContextPath: /admin
   connector:
     type: http
-    port: 9999
+    port: 0
 
 # default logging relies on logback JMXConfigurator
 # which no longer exists

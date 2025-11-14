@@ -2,7 +2,7 @@ package com.hubspot.dropwizard.guicier;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.dropwizard.setup.Bootstrap;
+import io.dropwizard.core.setup.Bootstrap;
 
 /**
  * Dropwizard makes it really hard to allow unknown fields in the {@link io.dropwizard.Configuration}

@@ -7,13 +7,14 @@ import com.google.inject.Key;
 import com.google.inject.Module;
 import com.google.inject.matcher.Matchers;
 import com.google.inject.spi.ProvisionListener;
+import com.hubspot.dropwizard.guicier.injection.InjectorProvider;
+import io.dropwizard.core.setup.Environment;
 import io.dropwizard.lifecycle.Managed;
 import io.dropwizard.lifecycle.ServerLifecycleListener;
 import io.dropwizard.servlets.tasks.Task;
-import io.dropwizard.setup.Environment;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.ext.Provider;
 import java.lang.reflect.Type;
-import javax.ws.rs.Path;
-import javax.ws.rs.ext.Provider;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.model.Resource;
 import org.slf4j.Logger;
@@ -59,6 +60,7 @@ public class DropwizardModule implements Module {
   }
 
   public void register(Injector injector) {
+    InjectorProvider.set(injector);
     registerResourcesAndProviders(environment.jersey().getResourceConfig(), injector);
   }
 

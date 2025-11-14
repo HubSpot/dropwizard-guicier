@@ -1,7 +1,7 @@
 package com.hubspot.dropwizard.guicier.objects;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 
 public class ProviderManagedProvider implements Provider<ProviderManaged> {
 
